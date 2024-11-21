@@ -1,0 +1,60 @@
+[gd_scene load_steps=8 format=3 uid="uid://cyfhw445f4w0v"]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_2o5qn"]
+[ext_resource type="Script" path="res://scripts/xr_origin_3d.gd" id="2_d2soe"]
+[ext_resource type="PackedScene" uid="uid://cl2t6u6m20r0p" path="res://Nodes/Essentials/controller.tscn" id="2_h572j"]
+[ext_resource type="Script" path="res://scripts/open_xr_fb_passthrough_geometry.gd" id="3_s0j7b"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_tvdja"]
+sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+
+[sub_resource type="Sky" id="Sky_x0hsf"]
+sky_material = SubResource("ProceduralSkyMaterial_tvdja")
+
+[sub_resource type="Environment" id="Environment_fjqtr"]
+background_mode = 2
+sky = SubResource("Sky_x0hsf")
+tonemap_mode = 2
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_2o5qn")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.924573, 0.227053, -0.305961, 0, 0.803036, 0.595931, 0.381006, -0.550981, 0.742465, 0, 3.85782, 0)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_fjqtr")
+
+[node name="XROrigin3D" type="XROrigin3D" parent="."]
+script = ExtResource("2_d2soe")
+
+[node name="LeftController" type="XRController3D" parent="XROrigin3D"]
+tracker = &"left_hand"
+pose = &"grip"
+
+[node name="Controller" parent="XROrigin3D/LeftController" instance=ExtResource("2_h572j")]
+
+[node name="OpenXRFbRenderModel" type="OpenXRFbRenderModel" parent="XROrigin3D/LeftController"]
+transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 0, 0, 0)
+
+[node name="RightController" type="XRController3D" parent="XROrigin3D"]
+tracker = &"right_hand"
+pose = &"grip"
+
+[node name="Controller" parent="XROrigin3D/RightController" instance=ExtResource("2_h572j")]
+
+[node name="OpenXRFbRenderModel" type="OpenXRFbRenderModel" parent="XROrigin3D/RightController"]
+render_model_type = 1
+transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 0, 0, 0)
+
+[node name="XRCamera3D" type="XRCamera3D" parent="XROrigin3D"]
+
+[node name="MindMapContainer" type="Node3D" parent="XROrigin3D"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, -0.5)
+
+[node name="OpenXRFbPassthroughGeometry" type="OpenXRFbPassthroughGeometry" parent="XROrigin3D"]
+script = ExtResource("3_s0j7b")
+
+[connection signal="button_pressed" from="XROrigin3D/LeftController" to="." method="_on_left_controller_button_pressed"]
+[connection signal="button_pressed" from="XROrigin3D/RightController" to="." method="_on_right_controller_button_pressed"]

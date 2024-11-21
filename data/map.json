@@ -1,0 +1,94 @@
+{
+	"label": "Graph Name",
+	"nodes": [
+		{
+			"id": "0918def0-1a6e-4a86-8575-9f11b780e50e",
+			"label": "Node A",
+			"type": "common_sphere",
+			"color": "#AA4A44",
+	   		"position": {
+			  "x": 0.5,
+			  "y": 0.2,
+			  "z": 0.5
+			},
+			"scales": {
+				"label": 0.5,
+				"node": 0.05
+			}
+		},
+		{
+			"id": "95aa6d1b-b975-447b-b5c3-4f0e5a0ee93b",
+			"label": "Node B",
+			"type": "common_sphere",
+			"color": "#EE4B2B",
+	   		"position": {
+			  "x": -0.8,
+			  "y": 0.3,
+			  "z": 0.8
+			},
+			"scales": {
+				"label": 0.5,
+				"node": 0.05
+			}
+		},
+		{
+			"id": "9b6c37dc-af06-41a0-a162-4aa916fb7b2c",
+			"label": "Node C",
+			"type": "common_sphere",
+			"color": "#EE4B2B",
+	   		"position": {
+			  "x": -0.5,
+			  "y": 0.2,
+			  "z": 0.5
+			},
+			"scales": {
+				"label": 0.5,
+				"node": 0.05
+			}
+		},
+		{
+			"id": "7825ddcf-69aa-4ff4-b993-1867cf5bc51b",
+			"label": "Node D",
+			"type": "common_cube",
+			"color": "#AA4A44",
+	   		"position": {
+			  "x": -0.05,
+			  "y": 0.2,
+			  "z": 0.01
+			},
+			"scales": {
+				"label": 1.5,
+				"node": 0.01
+			}
+		},
+		{
+			"id": "5c27271b-d867-4621-ad81-a9ac7ab073ea",
+			"label": "Node E",
+			"type": "common_sphere",
+			"color": "#AA4A44",
+	   		"position": {
+			  "x": 0,
+			  "y": 0,
+			  "z": 0
+			},
+			"scales": {
+				"label": 1.5,
+				"node": 0.05
+			}
+		}
+	],
+	"edges": [
+		  {
+			 "source": "0918def0-1a6e-4a86-8575-9f11b780e50e",
+			 "target": "95aa6d1b-b975-447b-b5c3-4f0e5a0ee93b"
+		  },
+		  {
+			 "source": "0918def0-1a6e-4a86-8575-9f11b780e50e",
+			 "target": "9b6c37dc-af06-41a0-a162-4aa916fb7b2c"
+		  },
+		  {
+			 "source": "9b6c37dc-af06-41a0-a162-4aa916fb7b2c",
+			 "target": "7825ddcf-69aa-4ff4-b993-1867cf5bc51b"
+		  }
+	 ] 
+}

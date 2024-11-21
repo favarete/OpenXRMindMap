@@ -1,0 +1,34 @@
+[gd_scene load_steps=6 format=3 uid="uid://cl2t6u6m20r0p"]
+
+[ext_resource type="Script" path="res://scripts/raycast.gd" id="1_ub723"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_qcj6j"]
+top_radius = 0.005
+bottom_radius = 0.005
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8meba"]
+shading_mode = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rioss"]
+transparency = 1
+albedo_color = Color(0.258824, 0.317647, 1, 0.490196)
+
+[sub_resource type="SphereMesh" id="SphereMesh_qlaky"]
+material = SubResource("StandardMaterial3D_rioss")
+
+[node name="Controller" type="Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.07, -0.09)
+
+[node name="ControllerRayCast" type="RayCast3D" parent="."]
+visible = false
+target_position = Vector3(0, -10, 0)
+script = ExtResource("1_ub723")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="ControllerRayCast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+mesh = SubResource("CylinderMesh_qcj6j")
+surface_material_override/0 = SubResource("StandardMaterial3D_8meba")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.05, 0, 0, 0, 0.05, 0, 0, 0, 0.05, 0, 0, 0)
+mesh = SubResource("SphereMesh_qlaky")

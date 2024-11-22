@@ -39,7 +39,7 @@ func build_graph(graph_data):
 		
 func create_node(node_data):
 	var node = MeshInstance3D.new()
-	node.mesh = MESHES.get(node_data["type"], null)
+	node.mesh = MESHES.get(node_data.type, null)
 	if node.mesh:
 		#node.material_override = create_material(node_data["color"])
 		node.scale = Vector3.ONE * node_data.scales.node
@@ -53,20 +53,20 @@ func create_node(node_data):
 		mind_map_container.add_child(node)
 
 		# Add label above the node
-		#if node_data["label"] != "":
-			#var label = create_label(node_data)
-			#node.add_child(label)
+		if node_data.label != "":
+			var label = create_label(node_data)
+			node.add_child(label)
 	
 	return node
 
 
-#func create_label(node_data):
-	#var label = Label3D.new()
-	#label.text = node_data["label"]
-	#label.scale = Vector3.ONE * node_data["scales"]["label"]
-	#label.position = Vector3(0, 2, 0)
-	#label.add_to_group("billboard_labels")
-	#return label
+func create_label(node_data):
+	var label = Label3D.new()
+	label.text = node_data.label
+	label.scale = Vector3.ONE * node_data.scales.label
+	label.position = Vector3(0, 1.5, 0)
+	label.add_to_group("billboard_labels")
+	return label
 	
 func set_initial_position():
 	var camera_position = camera.position
@@ -78,24 +78,21 @@ func _process(delta):
 	if camera:
 		if initial_position_is_not_set:
 			set_initial_position()
-		#for label in get_tree().get_nodes_in_group("billboard_labels"):
-			#var direction = camera.global_position - label.global_position
-#
-			## Validate the direction vector
-			#if direction.is_zero_approx():
-				#print("Direction vector is zero. Camera:", camera.global_position, "Label:", label.global_position)
-				#direction = Vector3(0, 0, 1)  # Fallback direction
+			
+		# Make labels look at camera
+		for label in get_tree().get_nodes_in_group("billboard_labels"):
+			var direction = camera.global_position - label.global_position
 #
 			## Normalize the direction vector
-			#direction = direction.normalized()
-			#var up = Vector3.UP
+			direction = -direction.normalized()
+			var up = Vector3.UP
 #
 			## Avoid parallel up and direction vectors
-			#if abs(direction.dot(up)) > 0.999:
-				#up = Vector3(0, 0, 1)
+			if abs(direction.dot(up)) > 0.999:
+				up = Vector3(0, 0, 1)
 #
 			## Apply the transform safely
-			#label.transform = Transform3D(Basis().looking_at(direction, up), label.global_position)
+			label.transform = Transform3D(Basis().looking_at(direction, up), label.position)
 #
 
 

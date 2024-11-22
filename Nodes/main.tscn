@@ -51,7 +51,7 @@ transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 0, 0, 0)
 [node name="XRCamera3D" type="XRCamera3D" parent="XROrigin3D"]
 
 [node name="MindMapContainer" type="Node3D" parent="XROrigin3D"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, -0.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5)
 
 [node name="OpenXRFbPassthroughGeometry" type="OpenXRFbPassthroughGeometry" parent="XROrigin3D"]
 script = ExtResource("3_s0j7b")

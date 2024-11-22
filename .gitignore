@@ -5,6 +5,7 @@
 .import/
 *.tmp
 *.import
+*.uid
 export.cfg
 export_presets.cfg
 

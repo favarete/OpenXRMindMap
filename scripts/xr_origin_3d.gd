@@ -34,14 +34,14 @@ func build_graph(graph_data):
 		create_node(node_data)
 	
 	# Create edges (connections)
-	#for edge_data in graph_data["edges"]:
-		#create_edge(edge_data, nodes_map)
+	for edge_data in graph_data.edges:
+		create_edge(edge_data)
 		
 func create_node(node_data):
 	var node = MeshInstance3D.new()
 	node.mesh = MESHES.get(node_data.type, null)
 	if node.mesh:
-		#node.material_override = create_material(node_data["color"])
+		node.material_override = create_material(node_data.color)
 		node.scale = Vector3.ONE * node_data.scales.node
 		node.name = node_data.id
 		
@@ -68,6 +68,74 @@ func create_label(node_data):
 	label.add_to_group("billboard_labels")
 	return label
 	
+func create_edge(edge_data):
+	var start_node = mind_map_container.get_node(edge_data.source)
+	var end_node = mind_map_container.get_node(edge_data.target)
+
+	if start_node and end_node:
+		var line = create_thick_line(start_node.position, end_node.position)
+		mind_map_container.add_child(line)
+
+func create_thick_line(start_pos: Vector3, end_pos: Vector3, radius: float = 0.002, segments: int = 32) -> MeshInstance3D:
+	# Create the MeshInstance3D and ImmediateMesh
+	var mesh_instance = MeshInstance3D.new()
+	var immediate_mesh = ImmediateMesh.new()
+	var material = create_material("#F5F5F5")
+	mesh_instance.mesh = immediate_mesh
+	#mesh_instance.material_override = material
+
+	# Calculate the direction vector and length
+	var direction = end_pos - start_pos
+	var length = direction.length()
+	var normalized_dir = -direction.normalized()
+
+	# Calculate orthogonal vectors for creating the circular cross-section
+	var up = Vector3.UP if abs(Vector3.UP.dot(normalized_dir)) < 0.99 else Vector3.RIGHT
+	var side_vector = normalized_dir.cross(up).normalized()
+	var up_vector = side_vector.cross(normalized_dir).normalized()
+
+	# Create the circular vertices at the start and end
+	var start_circle = []
+	var end_circle = []
+	for i in range(segments):
+		var angle = i * TAU / segments
+		var offset = side_vector * cos(angle) * radius + up_vector * sin(angle) * radius
+		start_circle.append(start_pos + offset)
+		end_circle.append(end_pos + offset)
+
+	# Begin defining the cylinder surface
+	immediate_mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES, material)
+
+	for i in range(segments):
+		# Connect current segment to the next segment
+		var next = (i + 1) % segments
+		
+		# Calculate the normal for the current segment
+		var normal = (start_circle[i] - start_pos).normalized()
+
+		# Add two triangles for the quad between start_circle and end_circle
+		# First triangle
+		immediate_mesh.surface_set_normal(normal)
+		immediate_mesh.surface_add_vertex(start_circle[i])
+		immediate_mesh.surface_set_normal(normal)
+		immediate_mesh.surface_add_vertex(end_circle[i])
+		immediate_mesh.surface_set_normal(normal)
+		immediate_mesh.surface_add_vertex(end_circle[next])
+
+		# Second triangle
+		immediate_mesh.surface_set_normal(normal)
+		immediate_mesh.surface_add_vertex(start_circle[i])
+		immediate_mesh.surface_set_normal(normal)
+		immediate_mesh.surface_add_vertex(end_circle[next])
+		immediate_mesh.surface_set_normal(normal)
+		immediate_mesh.surface_add_vertex(start_circle[next])
+
+	# End the surface
+	immediate_mesh.surface_end()
+
+	return mesh_instance
+
+	
 func set_initial_position():
 	var camera_position = camera.position
 	for child in mind_map_container.get_children():
@@ -93,29 +161,11 @@ func _process(delta):
 #
 			## Apply the transform safely
 			label.transform = Transform3D(Basis().looking_at(direction, up), label.position)
-#
 
-
-#func create_edge(edge_data, nodes_map):
-	#var start_node = nodes_map.get(edge_data["source"], null)
-	#var end_node = nodes_map.get(edge_data["target"], null)
-#
-	#if start_node and end_node:
-		#var line = create_line(start_node.global_position, end_node.global_position)
-		#add_child(line)
-
-#func create_line(start_pos: Vector3, end_pos: Vector3):
-	#var line = ImmediateMesh.new()
-	#var surface_tool = SurfaceTool.new()
-	#surface_tool.begin(Mesh.PRIMITIVE_LINES)
-	#surface_tool.add_vertex(start_pos)
-	#surface_tool.add_vertex(end_pos)
-	#surface_tool.commit(line)
-	#var line_instance = MeshInstance3D.new()
-	#line_instance.mesh = line
-	#return line_instance
-
-#func create_material(hex_color: String):
-	#var material = StandardMaterial3D.new()
-	#material.albedo_color = Color.html(hex_color)
-	#return material
+func create_material(hex_color: String):
+	var material = StandardMaterial3D.new()
+	material.albedo_color = Color.html(hex_color)
+	material.metallic = 0.2  # Adds a slight metallic sheen
+	material.roughness = 0.4  # Controls how shiny or matte the surface looks
+	material.metallic_specular = 0.4  # Maximum specular highlights for reflections
+	return material

@@ -1,7 +1,6 @@
-extends XROrigin3D
+extends Node3D
 
-@onready var camera: XRCamera3D = $XRCamera3D
-@onready var mind_map_container: Node3D = $MindMapContainer
+@onready var camera: XRCamera3D = get_parent().get_node("XRCamera3D")
 
 var initial_position_is_not_set = true
 
@@ -74,18 +73,18 @@ func create_node(node_data):
 	if node.mesh:
 		node.material_override = create_material(node_data.color)
 		node.scale = Vector3.ONE * node_data.scales.node
-		node.name = MindMapContainer.get_element_id(node_data.id, MindMapContainer.TYPE_MAP_NODE)
+		node.name = node_data.id
 		
 		node.position = Vector3( 
 			node_data.position.x,
 			node_data.position.y,
 			node_data.position.z
 			)
-		mind_map_container.add_child(node)
+			
+		add_child(node)
 		
 		# Adicionar um Area3D ao nó
 		var area = Area3D.new()
-		area.name = MindMapContainer.get_collider_id(node.name)
 		area.monitorable = true
 		area.monitoring = true
 		node.add_child(area)
@@ -96,7 +95,6 @@ func create_node(node_data):
 		# Add label above the node
 		if node_data.label != "":
 			var label = create_label(node_data)
-			label.name = MindMapContainer.get_element_id(node_data.id, MindMapContainer.TYPE_MAP_LABEL)
 			node.add_child(label)
 	
 	return node
@@ -112,18 +110,15 @@ func create_label(node_data):
 
 
 func create_edge(edge_data):
-	var source_node_id = MindMapContainer.get_element_id(edge_data.source, MindMapContainer.TYPE_MAP_NODE)
-	var target_node_id = MindMapContainer.get_element_id(edge_data.target, MindMapContainer.TYPE_MAP_NODE)
+	var source_node_id = edge_data.source
+	var target_node_id = edge_data.target
 	
-	var start_node = mind_map_container.get_node(source_node_id)
-	var end_node = mind_map_container.get_node(target_node_id)
+	var start_node = get_node(source_node_id)
+	var end_node = get_node(target_node_id)
 
 	if start_node and end_node:
 		var link = create_thick_line(start_node.position, end_node.position)
-		
-		# Builds link name from node names
-		link.name = MindMapContainer.get_element_id(edge_data.source, MindMapContainer.TYPE_MAP_EDGE, edge_data.target)
-		mind_map_container.add_child(link)
+		add_child(link)
 
 
 func create_thick_line(start_pos: Vector3, end_pos: Vector3, radius: float = 0.002, segments: int = 32) -> MeshInstance3D:
@@ -188,7 +183,7 @@ func create_thick_line(start_pos: Vector3, end_pos: Vector3, radius: float = 0.0
 
 func set_initial_position():
 	var camera_position = camera.position
-	for child in mind_map_container.get_children():
+	for child in get_children():
 		child.position += camera_position
 	initial_position_is_not_set = false
 

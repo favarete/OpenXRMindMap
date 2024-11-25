@@ -13,6 +13,7 @@ const MESHES = {
 func _ready() -> void:
 	load_graph("res://data/map.json")
 
+
 func load_graph(json_file_path: String):
 	var json_file = FileAccess.open(json_file_path, FileAccess.READ)
 	if not json_file:
@@ -28,6 +29,7 @@ func load_graph(json_file_path: String):
 		print("Failed to parse JSON. Ensure the file format is correct.")
 		return
 
+
 func build_graph(graph_data):
 	# Create nodes
 	for node_data in graph_data.nodes:
@@ -36,14 +38,43 @@ func build_graph(graph_data):
 	# Create edges (connections)
 	for edge_data in graph_data.edges:
 		create_edge(edge_data)
+
+
+func get_basic_collision_shapes(mesh_type, node_instance):
+	var collision_shape = CollisionShape3D.new()
 		
+	var aabb = node_instance.get_aabb()
+	var aabb_size = aabb.size
+			
+	match mesh_type:
+		"common_sphere":
+			var sphere_shape = SphereShape3D.new()
+			sphere_shape.radius = max(aabb_size.x, aabb_size.y, aabb_size.z) / 2
+			
+			collision_shape.shape = sphere_shape
+			return collision_shape
+		"common_cube":
+			var cube_shape = BoxShape3D.new()
+			cube_shape.size = aabb_size
+			
+			collision_shape.shape = cube_shape
+			return collision_shape
+		_:
+			# TODO: Add any way to identify wich basic shape is more adequate
+			# Using Box as a fallback for now
+			var cube_shape = BoxShape3D.new()
+			cube_shape.size = aabb_size
+			
+			collision_shape.shape = cube_shape
+			return collision_shape 
+	
 func create_node(node_data):
 	var node = MeshInstance3D.new()
 	node.mesh = MESHES.get(node_data.type, null)
 	if node.mesh:
 		node.material_override = create_material(node_data.color)
 		node.scale = Vector3.ONE * node_data.scales.node
-		node.name = node_data.id
+		node.name = MindMapContainer.get_element_id(node_data.id, MindMapContainer.TYPE_MAP_NODE)
 		
 		node.position = Vector3( 
 			node_data.position.x,
@@ -51,10 +82,21 @@ func create_node(node_data):
 			node_data.position.z
 			)
 		mind_map_container.add_child(node)
-
+		
+		# Adicionar um Area3D ao nó
+		var area = Area3D.new()
+		area.name = MindMapContainer.get_collider_id(node.name)
+		area.monitorable = true
+		area.monitoring = true
+		node.add_child(area)
+		
+		var collision_shape = get_basic_collision_shapes(node_data.type, node)
+		area.add_child(collision_shape)
+		
 		# Add label above the node
 		if node_data.label != "":
 			var label = create_label(node_data)
+			label.name = MindMapContainer.get_element_id(node_data.id, MindMapContainer.TYPE_MAP_LABEL)
 			node.add_child(label)
 	
 	return node
@@ -67,14 +109,22 @@ func create_label(node_data):
 	label.position = Vector3(0, 1.5, 0)
 	label.add_to_group("billboard_labels")
 	return label
-	
+
+
 func create_edge(edge_data):
-	var start_node = mind_map_container.get_node(edge_data.source)
-	var end_node = mind_map_container.get_node(edge_data.target)
+	var source_node_id = MindMapContainer.get_element_id(edge_data.source, MindMapContainer.TYPE_MAP_NODE)
+	var target_node_id = MindMapContainer.get_element_id(edge_data.target, MindMapContainer.TYPE_MAP_NODE)
+	
+	var start_node = mind_map_container.get_node(source_node_id)
+	var end_node = mind_map_container.get_node(target_node_id)
 
 	if start_node and end_node:
-		var line = create_thick_line(start_node.position, end_node.position)
-		mind_map_container.add_child(line)
+		var link = create_thick_line(start_node.position, end_node.position)
+		
+		# Builds link name from node names
+		link.name = MindMapContainer.get_element_id(edge_data.source, MindMapContainer.TYPE_MAP_EDGE, edge_data.target)
+		mind_map_container.add_child(link)
+
 
 func create_thick_line(start_pos: Vector3, end_pos: Vector3, radius: float = 0.002, segments: int = 32) -> MeshInstance3D:
 	# Create the MeshInstance3D and ImmediateMesh
@@ -135,12 +185,13 @@ func create_thick_line(start_pos: Vector3, end_pos: Vector3, radius: float = 0.0
 
 	return mesh_instance
 
-	
+
 func set_initial_position():
 	var camera_position = camera.position
 	for child in mind_map_container.get_children():
 		child.position += camera_position
 	initial_position_is_not_set = false
+
 
 func _process(delta):
 	if camera:
@@ -161,6 +212,7 @@ func _process(delta):
 #
 			## Apply the transform safely
 			label.transform = Transform3D(Basis().looking_at(direction, up), label.position)
+
 
 func create_material(hex_color: String):
 	var material = StandardMaterial3D.new()

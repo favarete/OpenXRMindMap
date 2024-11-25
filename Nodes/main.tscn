@@ -57,4 +57,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5)
 script = ExtResource("3_s0j7b")
 
 [connection signal="button_pressed" from="XROrigin3D/LeftController" to="." method="_on_left_controller_button_pressed"]
+[connection signal="button_released" from="XROrigin3D/LeftController" to="." method="_on_left_controller_button_released"]
 [connection signal="button_pressed" from="XROrigin3D/RightController" to="." method="_on_right_controller_button_pressed"]
+[connection signal="button_released" from="XROrigin3D/RightController" to="." method="_on_right_controller_button_released"]

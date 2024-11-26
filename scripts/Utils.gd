@@ -48,11 +48,28 @@ func unset_node_from_collison(controller_name: String, area: Area3D):
 
 #-------------------------------------------------------------------------------
 
+signal update_edge(edge_node, start_pos, end_pos)
+func move_active_node_edge(edges: Array):
+	var active_mind_map = Globals.get_active_mindmap()
+	for id in edges:
+		var edge_node = get_mindmap_node_by_name(id)
+		var source_node = get_mindmap_node_by_name(active_mind_map.edges[id].source)
+		var target_node = get_mindmap_node_by_name(active_mind_map.edges[id].target)
+		update_edge.emit(edge_node, source_node.position, target_node.position)
+	
+	#update_thick_line(line, sphere_a.global_transform.origin, sphere_b.global_transform.origin)
+
+#-------------------------------------------------------------------------------
+
 func move_active_node(controller_name: String, controller_position: Vector3):
 	var controller_ref = Globals.controllers[controller_name]
 	
 	controller_ref.active_node.global_transform.origin = \
 	controller_position + controller_ref.offset
+	
+	var active_node_edges = controller_ref.active_node.get_meta("edges")
+	if not active_node_edges.is_empty():
+		move_active_node_edge(active_node_edges)
 
 #-------------------------------------------------------------------------------
 

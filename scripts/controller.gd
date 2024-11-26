@@ -18,5 +18,4 @@ func _on_interactive_element_exited(area: Area3D) -> void:
 
 func _process(delta):
 	if Utils.valid_movement_action(controller_name):
-		print(Globals.controllers["LeftController"].active_node.name)
 		Utils.move_active_node(controller_name, global_transform.origin)

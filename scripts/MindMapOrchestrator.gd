@@ -10,7 +10,8 @@ const MESHES = {
 }
 
 func _ready() -> void:
-	load_graph("res://data/map.json")
+	load_graph("res://data/MindMap.json")
+	Utils.connect("update_edge", Callable(self, "update_thick_line"))
 
 
 func load_graph(json_file_path: String):
@@ -23,6 +24,7 @@ func load_graph(json_file_path: String):
 	var json_result = JSON.parse_string(json_text)
 	
 	if json_result is Dictionary:
+		Globals.set_active_mindmap(json_result) 
 		build_graph(json_result)
 	else:
 		print("Failed to parse JSON. Ensure the file format is correct.")
@@ -30,13 +32,13 @@ func load_graph(json_file_path: String):
 
 
 func build_graph(graph_data):
-	# Create nodes
-	for node_data in graph_data.nodes:
-		create_node(node_data)
+	for key in graph_data.nodes.keys():
+		var value = graph_data.nodes[key]
+		create_node(key, value)
 	
-	# Create edges (connections)
-	for edge_data in graph_data.edges:
-		create_edge(edge_data)
+	for key in graph_data.edges.keys():
+		var value = graph_data.edges[key]
+		create_edge(key, value)
 
 
 func get_basic_collision_shapes(mesh_type, node_instance):
@@ -67,18 +69,19 @@ func get_basic_collision_shapes(mesh_type, node_instance):
 			collision_shape.shape = cube_shape
 			return collision_shape 
 	
-func create_node(node_data):
+func create_node(key, value):
 	var node = MeshInstance3D.new()
-	node.mesh = MESHES.get(node_data.type, null)
+	node.mesh = MESHES.get(value.type, null)
 	if node.mesh:
-		node.material_override = create_material(node_data.color)
-		node.scale = Vector3.ONE * node_data.scales.node
-		node.name = node_data.id
+		node.material_override = create_material(value.color)
+		node.scale = Vector3.ONE * value.scales.node
+		node.name = key
+		node.set_meta("edges", value.edges)
 		
 		node.position = Vector3( 
-			node_data.position.x,
-			node_data.position.y,
-			node_data.position.z
+			value.position.x,
+			value.position.y,
+			value.position.z
 			)
 			
 		add_child(node)
@@ -91,12 +94,12 @@ func create_node(node_data):
 		area.set_collision_mask(Globals.CONTROLLER_LAYER)
 		node.add_child(area)
 		
-		var collision_shape = get_basic_collision_shapes(node_data.type, node)
+		var collision_shape = get_basic_collision_shapes(value.type, node)
 		area.add_child(collision_shape)
 		
 		# Add label above the node
-		if node_data.label != "":
-			var label = create_label(node_data)
+		if value.label != "":
+			var label = create_label(value)
 			node.add_child(label)
 	
 	return node
@@ -111,26 +114,24 @@ func create_label(node_data):
 	return label
 
 
-func create_edge(edge_data):
-	var source_node_id = edge_data.source
-	var target_node_id = edge_data.target
+func create_edge(key, value):
+	var source_node_id = value.source
+	var target_node_id = value.target
 	
 	var start_node = get_node(source_node_id)
 	var end_node = get_node(target_node_id)
 
 	if start_node and end_node:
-		var link = create_thick_line(start_node.position, end_node.position)
-		add_child(link)
+		var edge = create_thick_line(start_node.position, end_node.position)
+		edge.name = key
+		add_child(edge)
 
-
-func create_thick_line(start_pos: Vector3, end_pos: Vector3, radius: float = 0.002, segments: int = 32) -> MeshInstance3D:
-	# Create the MeshInstance3D and ImmediateMesh
-	var mesh_instance = MeshInstance3D.new()
-	var immediate_mesh = ImmediateMesh.new()
-	var material = create_material("#F5F5F5")
-	mesh_instance.mesh = immediate_mesh
-	#mesh_instance.material_override = material
-
+func create_immediate_mesh_line(
+	immediate_mesh: ImmediateMesh,
+	material: StandardMaterial3D,
+	start_pos: Vector3, 
+	end_pos: Vector3
+	):
 	# Calculate the direction vector and length
 	var direction = end_pos - start_pos
 	var length = direction.length()
@@ -144,18 +145,21 @@ func create_thick_line(start_pos: Vector3, end_pos: Vector3, radius: float = 0.0
 	# Create the circular vertices at the start and end
 	var start_circle = []
 	var end_circle = []
-	for i in range(segments):
-		var angle = i * TAU / segments
-		var offset = side_vector * cos(angle) * radius + up_vector * sin(angle) * radius
+	for i in range(Globals.EDGE_SEGMENTS):
+		var angle = i * TAU / Globals.EDGE_SEGMENTS
+		var offset = side_vector * cos(angle) * Globals.EDGE_RADIUS + up_vector * sin(angle) * Globals.EDGE_RADIUS
 		start_circle.append(start_pos + offset)
 		end_circle.append(end_pos + offset)
 
 	# Begin defining the cylinder surface
-	immediate_mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES, material)
+	if material:
+		immediate_mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES, material)
+	else:
+		immediate_mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES)
 
-	for i in range(segments):
+	for i in range(Globals.EDGE_SEGMENTS):
 		# Connect current segment to the next segment
-		var next = (i + 1) % segments
+		var next = (i + 1) % Globals.EDGE_SEGMENTS
 		
 		# Calculate the normal for the current segment
 		var normal = (start_circle[i] - start_pos).normalized()
@@ -180,10 +184,27 @@ func create_thick_line(start_pos: Vector3, end_pos: Vector3, radius: float = 0.0
 	# End the surface
 	immediate_mesh.surface_end()
 
+func create_thick_line(start_pos: Vector3, end_pos: Vector3) -> MeshInstance3D:
+	# Create the MeshInstance3D and ImmediateMesh
+	var mesh_instance = MeshInstance3D.new()
+	var immediate_mesh = ImmediateMesh.new()
+	Globals.EDGE_MATERIAL = create_material("#F5F5F5")
+	mesh_instance.mesh = immediate_mesh
+	mesh_instance.material_override = Globals.EDGE_MATERIAL
+	create_immediate_mesh_line(immediate_mesh, Globals.EDGE_MATERIAL, start_pos, end_pos)
 	return mesh_instance
 
 
+func update_thick_line(line: MeshInstance3D, start_pos: Vector3, end_pos: Vector3, radius: float = 0.002, segments: int = 32):
+	var immediate_mesh = line.mesh as ImmediateMesh
+	if immediate_mesh == null:
+		return
+	immediate_mesh.clear_surfaces()
+	create_immediate_mesh_line(immediate_mesh, Globals.EDGE_MATERIAL, start_pos, end_pos)
+
+
 func set_initial_position():
+	return
 	var camera_position = camera.position
 	for child in get_children():
 		child.position += camera_position

@@ -86,7 +86,9 @@ func create_node(node_data):
 		# Adicionar um Area3D ao nó
 		var area = Area3D.new()
 		area.monitorable = true
-		area.monitoring = true
+		area.monitoring = false
+		area.set_collision_layer(Globals.NODE_LAYER)
+		area.set_collision_mask(Globals.CONTROLLER_LAYER)
 		node.add_child(area)
 		
 		var collision_shape = get_basic_collision_shapes(node_data.type, node)

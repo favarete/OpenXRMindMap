@@ -32,8 +32,9 @@ func get_node_name_from_collider(area: Area3D):
 func set_node_from_collison(controller_name: String, area: Area3D):
 	var controller_ref = Globals.controllers[controller_name]
 	
-	controller_ref.is_interacting = true
-	controller_ref.active_node = get_mindmap_node_by_name(get_node_name_from_collider(area))
+	if not controller_ref.is_interacting:
+		controller_ref.is_interacting = true
+		controller_ref.active_node = get_mindmap_node_by_name(get_node_name_from_collider(area))
 
 #-------------------------------------------------------------------------------
 
@@ -42,8 +43,8 @@ func unset_node_from_collison(controller_name: String, area: Area3D):
 	
 	if controller_ref.active_node \
 	and controller_ref.active_node.name == get_node_name_from_collider(area):
-		controller_ref.active_node = null
 		controller_ref.is_interacting = false
+		controller_ref.active_node = null
 
 #-------------------------------------------------------------------------------
 

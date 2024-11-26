@@ -20,6 +20,15 @@ config/icon="res://icon.svg"
 Utils="*res://scripts/Utils.gd"
 Globals="*res://scripts/Globals.gd"
 
+[layer_names]
+
+3d_physics/layer_1="Controller"
+3d_physics/layer_2="Nodes"
+3d_physics/layer_3="Labels"
+3d_physics/layer_4="Connections"
+3d_physics/layer_5="Menu"
+3d_physics/layer_6="Keyboard"
+
 [navigation]
 
 3d/default_up=Vector3(0, 0, -1)

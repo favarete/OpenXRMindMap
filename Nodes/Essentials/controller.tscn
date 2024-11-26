@@ -34,6 +34,8 @@ mesh = SubResource("CylinderMesh_qcj6j")
 surface_material_override/0 = SubResource("StandardMaterial3D_8meba")
 
 [node name="Area3D" type="Area3D" parent="."]
+collision_mask = 31
+monitorable = false
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
 transform = Transform3D(0.06, 0, 0, 0, 0.06, 0, 0, 0, 0.06, 0, 0, 0)

@@ -12,6 +12,8 @@ config_version=5
 
 config/name="MindMap3D"
 run/main_scene="res://Nodes/main.tscn"
+config/use_custom_user_dir=true
+config/custom_user_dir_name="OpenXRMindMapData"
 config/features=PackedStringArray("4.4", "GL Compatibility")
 config/icon="res://icon.svg"
 
@@ -19,6 +21,7 @@ config/icon="res://icon.svg"
 
 Utils="*res://scripts/Utils.gd"
 Globals="*res://scripts/Globals.gd"
+Saver="*res://scripts/Saver.gd"
 
 [layer_names]
 

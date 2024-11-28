@@ -63,3 +63,7 @@ func _on_right_controller_button_pressed(action_name: String) -> void:
 func _on_right_controller_button_released(action_name: String) -> void:
 	if action_name == "grip_click":
 		Utils.unset_button_pressed("RightController", "grip_click")
+
+
+func _on_main_timer_timeout() -> void:
+	Saver.save_current_state()

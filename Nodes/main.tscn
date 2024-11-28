@@ -20,6 +20,10 @@ tonemap_mode = 2
 [node name="StartXR" type="Node3D"]
 script = ExtResource("1_2o5qn")
 
+[node name="MainTimer" type="Timer" parent="."]
+wait_time = 2.0
+one_shot = true
+
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.924573, 0.227053, -0.305961, 0, 0.803036, 0.595931, 0.381006, -0.550981, 0.742465, 0, 3.85782, 0)
 
@@ -56,6 +60,7 @@ script = ExtResource("2_d2soe")
 [node name="OpenXRFbPassthroughGeometry" type="OpenXRFbPassthroughGeometry" parent="XROrigin3D"]
 script = ExtResource("3_s0j7b")
 
+[connection signal="timeout" from="MainTimer" to="." method="_on_main_timer_timeout"]
 [connection signal="button_pressed" from="XROrigin3D/LeftController" to="." method="_on_left_controller_button_pressed"]
 [connection signal="button_released" from="XROrigin3D/LeftController" to="." method="_on_left_controller_button_released"]
 [connection signal="button_pressed" from="XROrigin3D/RightController" to="." method="_on_right_controller_button_pressed"]

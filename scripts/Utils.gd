@@ -2,6 +2,14 @@ extends Node
 
 #-------------------------------------------------------------------------------
 
+func get_main_timer() -> Node:
+	const REF_POSITION = "StartXR/MainTimer"
+	var root = get_tree().root
+	if root.has_node(REF_POSITION):
+		return root.get_node(REF_POSITION)
+	else:
+		return null
+
 func get_mindmap_node_by_name(node_name: String) -> Node:
 	const REF_POSITION = "StartXR/XROrigin3D/MindMapContainer"
 	
@@ -48,6 +56,45 @@ func unset_node_from_collison(controller_name: String, area: Area3D):
 
 #-------------------------------------------------------------------------------
 
+		#"7825ddcf-69aa-4ff4-b993-1867cf5bc51b": {
+			#"label": "Node D",
+			#"type": "common_cube",
+			#"color": "#AA4A44",
+			#"position": {
+				#"x": -0.05,
+				#"y": 0.2,
+				#"z": -0.01
+			#},
+			#"scales": {
+				#"label": 2,
+				#"node": 0.05
+			#},
+			#"edges": [
+				#"85d143e6-4567-4b53-9778-8f19946e9edc"
+			#]
+		#},
+
+
+func update_mindmap_data(reference_node):
+	var actual_mindmap = Globals.get_active_mindmap()
+	var node_to_update = actual_mindmap.nodes[reference_node.name]
+	
+	#node_to_update.label = reference_node.label
+	
+	#node_to_update.type =  reference_node.type
+	#node_to_update.color =  reference_node.color
+	node_to_update.position = {
+		"x": reference_node.position.x,
+		"y": reference_node.position.y,
+		"z": reference_node.position.z
+		}
+	#node_to_update.scales = {
+		#"label": reference_node,
+		#"node": 0.05
+	#}
+
+#-------------------------------------------------------------------------------
+
 signal update_edge(edge_node, start_pos, end_pos)
 func move_active_node_edge(edges: Array):
 	var active_mind_map = Globals.get_active_mindmap()
@@ -56,8 +103,7 @@ func move_active_node_edge(edges: Array):
 		var source_node = get_mindmap_node_by_name(active_mind_map.edges[id].source)
 		var target_node = get_mindmap_node_by_name(active_mind_map.edges[id].target)
 		update_edge.emit(edge_node, source_node.position, target_node.position)
-	
-	#update_thick_line(line, sphere_a.global_transform.origin, sphere_b.global_transform.origin)
+
 
 #-------------------------------------------------------------------------------
 
@@ -66,6 +112,8 @@ func move_active_node(controller_name: String, controller_position: Vector3):
 	
 	controller_ref.active_node.global_transform.origin = \
 	controller_position + controller_ref.offset
+	
+	update_mindmap_data(controller_ref.active_node)
 	
 	var active_node_edges = controller_ref.active_node.get_meta("edges")
 	if not active_node_edges.is_empty():

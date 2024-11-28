@@ -10,7 +10,7 @@ const MESHES = {
 }
 
 func _ready() -> void:
-	load_graph("res://data/MindMap.json")
+	load_graph("user://new_data.json")
 	Utils.connect("update_edge", Callable(self, "update_thick_line"))
 
 

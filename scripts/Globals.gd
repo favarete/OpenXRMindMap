@@ -1,5 +1,7 @@
 extends Node
 
+const SAVE_DELAY = 2.5
+
 const CONTROLLER_LAYER = 1
 const NODE_LAYER = 2
 const LABEL_LAYER = 3

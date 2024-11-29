@@ -1,7 +1,7 @@
 [gd_scene load_steps=8 format=3 uid="uid://cl2t6u6m20r0p"]
 
-[ext_resource type="Script" uid="uid://d3pxooneotnmg" path="res://scripts/Controller.gd" id="1_td7h1"]
-[ext_resource type="Script" uid="uid://jpthj33k3384" path="res://scripts/ControllerRaycast.gd" id="1_ub723"]
+[ext_resource type="Script" uid="uid://d3pxooneotnmg" path="res://Scripts/Controller.gd" id="1_td7h1"]
+[ext_resource type="Script" uid="uid://jpthj33k3384" path="res://Scripts/ControllerRaycast.gd" id="1_ub723"]
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_qcj6j"]
 top_radius = 0.005

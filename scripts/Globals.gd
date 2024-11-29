@@ -1,17 +1,27 @@
 extends Node
 
-const SAVE_DELAY = 2.5
+# Timw without action before autosave
+const SAVE_DELAY := 1
 
-const CONTROLLER_LAYER = 1
-const NODE_LAYER = 2
-const LABEL_LAYER = 3
-const CONNECTION_LAYER = 4
-const MENU_LAYER = 5
-const KEYBOARD_LAYER = 6
+# Collisoon Layers
+const CONTROLLER_LAYER := 1
+const NODE_LAYER := 2
+const LABEL_LAYER := 3
+const CONNECTION_LAYER := 4
+const MENU_LAYER := 5
+const KEYBOARD_LAYER := 6
 
-const EDGE_RADIUS: float = 0.002
-const EDGE_SEGMENTS: int = 32
-var EDGE_MATERIAL: StandardMaterial3D = null
+# Default Values
+const DEFAULT_EDGE_RADIUS := 0.002
+const DEFAULT_EDGE_SEGMENTS := 32
+const DEFAULT_NODE_TYPE := "common_sphere"
+const DEFAULT_NODE_COLOR := "#FFFFFF"
+const DEFAULT_NODE_SCALE := 0.05
+const DEFAULT_LABEL_TEXT := ""
+const DEFAULT_LABEL_SCALE := 1
+
+# GLobal Placeholders
+var DEFAULT_EDGE_MATERIAL: StandardMaterial3D = null
 
 #-------------------------------------------------------------------------------
 
@@ -27,13 +37,11 @@ func get_active_mindmap():
 
 var controllers = {
 	"LeftController": {
-		"is_interacting": false,
 		"active_node": null,
 		"offset": Vector3.ZERO,
 		"active_actions": []
 	},
 	"RightController": {
-		"is_interacting": false,
 		"active_node": null,
 		"offset": Vector3.ZERO,
 		"active_actions": []

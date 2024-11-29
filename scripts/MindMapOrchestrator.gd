@@ -12,6 +12,7 @@ const MESHES = {
 func _ready() -> void:
 	load_graph("user://new_data.json")
 	Utils.connect("update_edge", Callable(self, "update_thick_line"))
+	Utils.connect("add_node", Callable(self, "create_node"))
 
 
 func load_graph(json_file_path: String):
@@ -145,9 +146,9 @@ func create_immediate_mesh_line(
 	# Create the circular vertices at the start and end
 	var start_circle = []
 	var end_circle = []
-	for i in range(Globals.EDGE_SEGMENTS):
-		var angle = i * TAU / Globals.EDGE_SEGMENTS
-		var offset = side_vector * cos(angle) * Globals.EDGE_RADIUS + up_vector * sin(angle) * Globals.EDGE_RADIUS
+	for i in range(Globals.DEFAULT_EDGE_SEGMENTS):
+		var angle = i * TAU / Globals.DEFAULT_EDGE_SEGMENTS
+		var offset = side_vector * cos(angle) * Globals.DEFAULT_EDGE_RADIUS + up_vector * sin(angle) * Globals.DEFAULT_EDGE_RADIUS
 		start_circle.append(start_pos + offset)
 		end_circle.append(end_pos + offset)
 
@@ -157,9 +158,9 @@ func create_immediate_mesh_line(
 	else:
 		immediate_mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES)
 
-	for i in range(Globals.EDGE_SEGMENTS):
+	for i in range(Globals.DEFAULT_EDGE_SEGMENTS):
 		# Connect current segment to the next segment
-		var next = (i + 1) % Globals.EDGE_SEGMENTS
+		var next = (i + 1) % Globals.DEFAULT_EDGE_SEGMENTS
 		
 		# Calculate the normal for the current segment
 		var normal = (start_circle[i] - start_pos).normalized()
@@ -188,33 +189,32 @@ func create_thick_line(start_pos: Vector3, end_pos: Vector3) -> MeshInstance3D:
 	# Create the MeshInstance3D and ImmediateMesh
 	var mesh_instance = MeshInstance3D.new()
 	var immediate_mesh = ImmediateMesh.new()
-	Globals.EDGE_MATERIAL = create_material("#F5F5F5")
+	Globals.DEFAULT_EDGE_MATERIAL = create_material("#F5F5F5")
 	mesh_instance.mesh = immediate_mesh
-	mesh_instance.material_override = Globals.EDGE_MATERIAL
-	create_immediate_mesh_line(immediate_mesh, Globals.EDGE_MATERIAL, start_pos, end_pos)
+	mesh_instance.material_override = Globals.DEFAULT_EDGE_MATERIAL
+	create_immediate_mesh_line(immediate_mesh, Globals.DEFAULT_EDGE_MATERIAL, start_pos, end_pos)
 	return mesh_instance
 
 
-func update_thick_line(line: MeshInstance3D, start_pos: Vector3, end_pos: Vector3, radius: float = 0.002, segments: int = 32):
+func update_thick_line(line: MeshInstance3D, start_pos: Vector3, end_pos: Vector3):
 	var immediate_mesh = line.mesh as ImmediateMesh
 	if immediate_mesh == null:
 		return
 	immediate_mesh.clear_surfaces()
-	create_immediate_mesh_line(immediate_mesh, Globals.EDGE_MATERIAL, start_pos, end_pos)
+	create_immediate_mesh_line(immediate_mesh, Globals.DEFAULT_EDGE_MATERIAL, start_pos, end_pos)
 
 
-func set_initial_position():
-	return
-	var camera_position = camera.position
-	for child in get_children():
-		child.position += camera_position
-	initial_position_is_not_set = false
+#func set_initial_position():
+	#var camera_position = camera.position
+	#for child in get_children():
+		#child.position += camera_position
+	#initial_position_is_not_set = false
 
 
 func _process(delta):
 	if camera:
-		if initial_position_is_not_set:
-			set_initial_position()
+		#if initial_position_is_not_set:
+			#set_initial_position()
 			
 		# Make labels look at camera
 		for label in get_tree().get_nodes_in_group("billboard_labels"):

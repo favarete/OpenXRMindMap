@@ -31,8 +31,13 @@ func enable_passthrough_mode() -> void:
 	fb_passthrough.set_passthrough_filter(OpenXRFbPassthroughExtensionWrapper.PASSTHROUGH_FILTER_DISABLED)
 
 func _on_left_controller_button_pressed(action_name: String) -> void:
-	if action_name == "grip_click":
-		Utils.set_button_pressed("LeftController", "grip_click")
+	match action_name:
+		"grip_click":
+			Utils.set_button_pressed("LeftController", "grip_click")
+		"trigger_click":
+			Utils.set_button_pressed("LeftController", "trigger_click")
+
+
 	#if action_name == "trigger_click" and left_controller_ray_cast.is_colliding():
 	#	var collider = left_controller_ray_cast.get_collider()
 		# func_name(collider.name)
@@ -44,13 +49,19 @@ func _on_left_controller_button_pressed(action_name: String) -> void:
 
 
 func _on_left_controller_button_released(action_name: String) -> void:
-	if action_name == "grip_click":
-		Utils.unset_button_pressed("LeftController", "grip_click")
+	match action_name:
+		"grip_click":
+			Utils.unset_button_pressed("LeftController", "grip_click")
+		"trigger_click":
+			Utils.unset_button_pressed("LeftController", "trigger_click")
 
 
 func _on_right_controller_button_pressed(action_name: String) -> void:
-	if action_name == "grip_click":
-		Utils.set_button_pressed("RightController", "grip_click")
+	match action_name:
+		"grip_click":
+			Utils.set_button_pressed("RightController", "grip_click")
+		"trigger_click":
+			Utils.set_button_pressed("RightController", "trigger_click")
 	#if action_name == "trigger_click" and right_controller_ray_cast.is_colliding():
 	#	var collider = right_controller_ray_cast.get_collider()
 
@@ -61,8 +72,11 @@ func _on_right_controller_button_pressed(action_name: String) -> void:
 
 
 func _on_right_controller_button_released(action_name: String) -> void:
-	if action_name == "grip_click":
-		Utils.unset_button_pressed("RightController", "grip_click")
+	match action_name:
+		"grip_click":
+			Utils.unset_button_pressed("RightController", "grip_click")
+		"trigger_click":
+			Utils.unset_button_pressed("RightController", "trigger_click")
 
 
 func _on_main_timer_timeout() -> void:

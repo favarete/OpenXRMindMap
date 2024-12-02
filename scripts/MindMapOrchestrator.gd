@@ -13,6 +13,7 @@ func _ready() -> void:
 	load_graph("user://new_data.json")
 	Utils.connect("update_edge", Callable(self, "update_thick_line"))
 	Utils.connect("add_node", Callable(self, "create_node"))
+	Utils.connect("add_edge", Callable(self, "create_edge"))
 
 
 func load_graph(json_file_path: String):
@@ -116,8 +117,10 @@ func create_label(node_data):
 
 
 func create_edge(key, value):
-	var source_node_id = value.source
-	var target_node_id = value.target
+	var source_node_id = NodePath(value.source)
+	var target_node_id = NodePath(value.target)
+	
+	print(value)
 	
 	var start_node = get_node(source_node_id)
 	var end_node = get_node(target_node_id)

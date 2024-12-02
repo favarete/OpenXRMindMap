@@ -4,7 +4,8 @@ extends Node3D
 
 @onready var controller_name = get_parent().name
 @onready var main_timer = Utils.get_main_timer()
-@onready var sphere_guide: MeshInstance3D = $MeshInstance3D
+@onready var sphere_guide := $MeshInstance3D
+@onready var collision_guide := $Area3D
 @onready var mind_map_container = Utils.get_mind_map_container()
 
 #-------------------------------------------------------------------------------
@@ -24,12 +25,19 @@ func get_local_position():
 	return mind_map_container.to_local(sphere_guide.global_transform.origin)
 
 func _process(delta):
-	if Utils.valid_movement_action(controller_name):
-		Utils.move_active_node(controller_name, get_local_position())
+	if Utils.performing_creation(controller_name):
 		main_timer.stop()
-	if Utils.valid_add_node_action(controller_name):
-		Utils.add_new_node(controller_name, get_local_position())
-		main_timer.stop()
+		if Globals.controllers[controller_name].node_connection.is_adding_edge:
+			var all_collisions = collision_guide.get_overlapping_areas()
+			if Utils.verify_edge_action(controller_name, all_collisions):
+				print("CONNECT!")
+		else:
+			if Utils.valid_add_node_action(controller_name):
+				Utils.add_new_node(controller_name, get_local_position())
 	else:
-		if main_timer.is_stopped():
-			main_timer.start(Globals.SAVE_DELAY)
+		if Utils.valid_movement_action(controller_name):
+			main_timer.stop()
+			Utils.move_active_node(controller_name, get_local_position())
+		else:
+			if main_timer.is_stopped():
+				main_timer.start(Globals.SAVE_DELAY)

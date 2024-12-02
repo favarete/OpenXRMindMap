@@ -70,29 +70,33 @@ func unset_node_from_collison(controller_name: String, area: Area3D):
 		#},
 
 
-func update_mindmap_data(reference_node, action_name):
+func update_mindmap_data(reference_data, action_name):
 	var actual_mindmap = Globals.get_active_mindmap()
 	
 	match action_name:
-		"update":
-			var node_to_update = actual_mindmap.nodes[reference_node.name]
+		"update-node":
+			var node_to_update = actual_mindmap.nodes[reference_data.name]
 	
 			#node_to_update.label = reference_node.label
 	
 			#node_to_update.type =  reference_node.type
 			#node_to_update.color =  reference_node.color
 			node_to_update.position = {
-				"x": reference_node.position.x,
-				"y": reference_node.position.y,
-				"z": reference_node.position.z
+				"x": reference_data.position.x,
+				"y": reference_data.position.y,
+				"z": reference_data.position.z
 				}
 			#node_to_update.scales = {
 				#"label": reference_node,
 				#"node": 0.05
 			#}
-		"add":
-			actual_mindmap.nodes[reference_node.key] = reference_node.value
-			pass
+		"add-node":
+			actual_mindmap.nodes[reference_data.key] = reference_data.value
+		"add-edge":
+			actual_mindmap.edges[reference_data.key] = {
+				"source": reference_data.source,
+				"target": reference_data.target
+			}
 
 #-------------------------------------------------------------------------------
 
@@ -111,7 +115,7 @@ func move_active_node(controller_name: String, controller_position: Vector3):
 	
 	controller_ref.active_node.position = controller_position + controller_ref.offset
 	
-	update_mindmap_data(controller_ref.active_node, "update")
+	update_mindmap_data(controller_ref.active_node, "update-node")
 	
 	var active_node_edges = controller_ref.active_node.get_meta("edges")
 	if not active_node_edges.is_empty():
@@ -143,7 +147,7 @@ func add_new_node(controller_name: String, controller_position: Vector3):
 	unset_button_pressed(controller_name, "trigger_click")
 	add_node.emit(new_node_key, new_node_value)
 	
-	update_mindmap_data({"key": new_node_key, "value": new_node_value}, "add")
+	update_mindmap_data({"key": new_node_key, "value": new_node_value}, "add-node")
 
 
 #-------------------------------------------------------------------------------
@@ -165,6 +169,52 @@ func valid_add_node_action(controller_name: String):
 	
 	return check_conditions
 
+func performing_creation(controller_name: String):
+	var controller_ref = Globals.controllers[controller_name]
+	return controller_ref.active_actions.has("trigger_click")
+	
+
+func update_node_connection(new_edge_data: Dictionary):
+	var start_node_instance = get_mindmap_node_by_name(new_edge_data.source)
+	var end_node_instance = get_mindmap_node_by_name(new_edge_data.target)
+	var edge_id = new_edge_data.key
+	
+	var start_node_edges = start_node_instance.get_meta("edges")
+	if not start_node_edges.has(edge_id):
+		start_node_edges.append(edge_id)
+		start_node_instance.set_meta("edges", start_node_edges)
+		
+	var end_node_edges = end_node_instance.get_meta("edges")
+	if not end_node_edges.has(edge_id):
+		end_node_edges.append(edge_id)
+		end_node_instance.set_meta("edges", end_node_edges)
+
+signal add_edge(key, value)
+func verify_edge_action(controller_name: String, collision_guide: Array[Area3D]):
+	var controller_ref = Globals.controllers[controller_name]
+	var start_connection = controller_ref.node_connection.start.name
+
+	for collision in collision_guide:
+		var end_connection = get_node_name_from_collider(collision)
+		if start_connection != end_connection:
+			unset_button_pressed(controller_name, "trigger_click")
+			if Globals.connection_is_new(start_connection, end_connection):
+				var new_edge_key = uuid_util.v4()
+				
+				var new_edge_data = {
+					"source": start_connection, 
+					"target": end_connection
+				}
+				
+				add_edge.emit(new_edge_key, new_edge_data)
+				
+				new_edge_data["key"] = new_edge_key
+				
+				update_node_connection(new_edge_data)
+				update_mindmap_data(new_edge_data, "add-edge")
+			break
+	
+
 #-------------------------------------------------------------------------------
 
 func set_controller_offset(controller_name: String):
@@ -180,8 +230,18 @@ func set_controller_offset(controller_name: String):
 
 func set_button_pressed(controller_name: String, action: String):
 	var controller_ref = Globals.controllers[controller_name]
+
 	set_controller_offset(controller_name)
 	if not controller_ref.active_actions.has(action):
+		if action == "trigger_click":
+			if controller_ref.active_node:
+				controller_ref.node_connection.is_adding_edge = true
+				controller_ref.node_connection.start = controller_ref.active_node
+			else:
+				controller_ref.node_connection.is_adding_edge = false
+				controller_ref.node_connection.start = null
+			controller_ref.node_connection.end = null
+				
 		controller_ref.active_actions.append(action)
 
 #-------------------------------------------------------------------------------
@@ -190,6 +250,10 @@ func unset_button_pressed(controller_name: String, action: String):
 	var controller_ref = Globals.controllers[controller_name]
 	
 	if controller_ref.active_actions.has(action):
+		if controller_ref.active_actions.has("trigger_click"):
+			controller_ref.node_connection.is_adding_edge = false
+			controller_ref.node_connection.start = null
+			controller_ref.node_connection.end = null
+		
 		controller_ref.active_actions.erase(action)
 		controller_ref.offset = Vector3.ZERO
-	

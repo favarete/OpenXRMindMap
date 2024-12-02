@@ -30,8 +30,19 @@ var LoadedMindMap = null
 func set_active_mindmap(mindmap_data):
 	LoadedMindMap = mindmap_data
 	
-func get_active_mindmap():
+func get_active_mindmap() -> Dictionary:
 	return LoadedMindMap
+	
+
+func connection_is_new(uuid1: String, uuid2: String) -> bool:
+	var actual_mindmap = get_active_mindmap()
+	
+	for key in actual_mindmap.edges.keys():
+		var entry = actual_mindmap.edges[key]
+		if (entry["source"] == uuid1 and entry["target"] == uuid2) or \
+		   (entry["source"] == uuid2 and entry["target"] == uuid1):
+			return false
+	return true
 
 #-------------------------------------------------------------------------------
 
@@ -39,11 +50,21 @@ var controllers = {
 	"LeftController": {
 		"active_node": null,
 		"offset": Vector3.ZERO,
-		"active_actions": []
+		"active_actions": [],
+		"node_connection": {
+			"is_adding_edge": false,
+			"start": null,
+			"end": null
+		}
 	},
 	"RightController": {
 		"active_node": null,
 		"offset": Vector3.ZERO,
-		"active_actions": []
+		"active_actions": [],
+		"node_connection": {
+			"is_adding_edge": false,
+			"start": null,
+			"end": null
+		}
 	}
 }

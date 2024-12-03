@@ -152,26 +152,6 @@ func add_new_node(controller_name: String, controller_position: Vector3):
 
 #-------------------------------------------------------------------------------
 
-func valid_movement_action(controller_name: String):
-	var controller_ref = Globals.controllers[controller_name]
-	
-	var check_conditions = controller_ref.active_node \
-	and controller_ref.active_actions.has("grip_click")
-	
-	return check_conditions
-
-
-func valid_add_node_action(controller_name: String):
-	var controller_ref = Globals.controllers[controller_name]
-	
-	var check_conditions = not controller_ref.active_node \
-	and controller_ref.active_actions.has("trigger_click")
-	
-	return check_conditions
-
-func performing_creation(controller_name: String):
-	var controller_ref = Globals.controllers[controller_name]
-	return controller_ref.active_actions.has("trigger_click")
 	
 
 func update_node_connection(new_edge_data: Dictionary):
@@ -222,7 +202,7 @@ func set_controller_offset(controller_name: String):
 	if controller_ref.active_node:
 		var node_position = controller_ref.active_node.global_transform.origin
 		var controller_instance = get_controller_node_by_name(controller_name)
-		var controller_collider = controller_instance.get_node("Controller/MeshInstance3D")
+		var controller_collider = controller_instance.get_node("Controller/Guide/MainSphere")
 	
 		controller_ref.offset = node_position  - controller_collider.global_transform.origin
 		

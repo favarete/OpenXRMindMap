@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://cl2t6u6m20r0p"]
+[gd_scene load_steps=11 format=3 uid="uid://cl2t6u6m20r0p"]
 
 [ext_resource type="Script" uid="uid://d3pxooneotnmg" path="res://Scripts/Controller.gd" id="1_td7h1"]
 [ext_resource type="Script" uid="uid://jpthj33k3384" path="res://Scripts/ControllerRaycast.gd" id="1_ub723"]
@@ -12,9 +12,29 @@ shading_mode = 0
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_td7h1"]
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_td7h1"]
+cull_mode = 1
+shading_mode = 0
+albedo_color = Color(0, 0, 0, 1)
+grow = true
+grow_amount = 0.1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sjvan"]
+next_pass = SubResource("StandardMaterial3D_td7h1")
+transparency = 1
+albedo_color = Color(1, 1, 1, 0.588235)
+metallic_specular = 0.0
+roughness = 0.0
+emission_enabled = true
+emission = Color(1, 1, 1, 1)
+emission_energy_multiplier = 0.2
+
+[sub_resource type="SphereMesh" id="SphereMesh_gbk40"]
+material = SubResource("StandardMaterial3D_sjvan")
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rioss"]
 transparency = 1
-albedo_color = Color(0.258824, 0.317647, 1, 0.490196)
+albedo_color = Color(0, 0, 0, 0.490196)
 
 [sub_resource type="SphereMesh" id="SphereMesh_qlaky"]
 material = SubResource("StandardMaterial3D_rioss")
@@ -41,9 +61,16 @@ monitorable = false
 transform = Transform3D(0.06, 0, 0, 0, 0.06, 0, 0, 0, 0.06, 0, 0, 0)
 shape = SubResource("SphereShape3D_td7h1")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="Guide" type="Node3D" parent="."]
+
+[node name="VisualFeedback" type="MeshInstance3D" parent="Guide"]
+mesh = SubResource("SphereMesh_gbk40")
+skeleton = NodePath("../..")
+
+[node name="MainSphere" type="MeshInstance3D" parent="Guide"]
 transform = Transform3D(0.05, 0, 0, 0, 0.05, 0, 0, 0, 0.05, 0, 0, 0)
 mesh = SubResource("SphereMesh_qlaky")
+skeleton = NodePath("../..")
 
 [connection signal="area_entered" from="Area3D" to="." method="_on_interactive_element_entered"]
 [connection signal="area_exited" from="Area3D" to="." method="_on_interactive_element_exited"]

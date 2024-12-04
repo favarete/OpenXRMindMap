@@ -64,6 +64,7 @@ shape = SubResource("SphereShape3D_td7h1")
 [node name="Guide" type="Node3D" parent="."]
 
 [node name="VisualFeedback" type="MeshInstance3D" parent="Guide"]
+transform = Transform3D(0.001, 0, 0, 0, 0.001, 0, 0, 0, 0.001, 0, 0, 0)
 mesh = SubResource("SphereMesh_gbk40")
 skeleton = NodePath("../..")
 

@@ -120,8 +120,6 @@ func create_edge(key, value):
 	var source_node_id = NodePath(value.source)
 	var target_node_id = NodePath(value.target)
 	
-	print(value)
-	
 	var start_node = get_node(source_node_id)
 	var end_node = get_node(target_node_id)
 

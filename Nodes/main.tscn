@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://b4dyvqahgjrym" path="res://Scripts/StartXRContainer.gd" id="1_2o5qn"]
 [ext_resource type="Script" uid="uid://c60red3ohxuu0" path="res://Scripts/MindMapOrchestrator.gd" id="2_d2soe"]
 [ext_resource type="PackedScene" uid="uid://cl2t6u6m20r0p" path="res://Nodes/Essentials/controller.tscn" id="2_h572j"]
-[ext_resource type="Script" uid="uid://c4ioou6o3o1ow" path="res://Scripts/OpenXRFbPassthroughGeometry.gd" id="3_s0j7b"]
+[ext_resource type="Script" uid="uid://c4ioou6o3o1ow" path="res://Scripts/OpenXRFBPassthroughGeometry.gd" id="3_s0j7b"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_tvdja"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -61,7 +61,9 @@ script = ExtResource("2_d2soe")
 script = ExtResource("3_s0j7b")
 
 [connection signal="timeout" from="MainTimer" to="." method="_on_main_timer_timeout"]
-[connection signal="button_pressed" from="XROrigin3D/LeftController" to="." method="_on_left_controller_button_pressed"]
-[connection signal="button_released" from="XROrigin3D/LeftController" to="." method="_on_left_controller_button_released"]
-[connection signal="button_pressed" from="XROrigin3D/RightController" to="." method="_on_right_controller_button_pressed"]
-[connection signal="button_released" from="XROrigin3D/RightController" to="." method="_on_right_controller_button_released"]
+[connection signal="button_pressed" from="XROrigin3D/LeftController" to="." method="_on_controller_button_pressed" binds= ["LeftController"]]
+[connection signal="button_released" from="XROrigin3D/LeftController" to="." method="_on_controller_button_released" binds= ["LeftController"]]
+[connection signal="input_vector2_changed" from="XROrigin3D/LeftController" to="." method="_on_controller_thumbstick_changed" binds= [&"LeftController"]]
+[connection signal="button_pressed" from="XROrigin3D/RightController" to="." method="_on_controller_button_pressed" binds= ["RightController"]]
+[connection signal="button_released" from="XROrigin3D/RightController" to="." method="_on_controller_button_released" binds= ["RightController"]]
+[connection signal="input_vector2_changed" from="XROrigin3D/RightController" to="." method="_on_controller_thumbstick_changed" binds= [&"RightController"]]

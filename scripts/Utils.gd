@@ -40,63 +40,12 @@ func set_node_from_collison(controller_name: String, area: Area3D):
 	if not controller_ref.active_node:
 		controller_ref.active_node = get_mindmap_node_by_name(get_node_name_from_collider(area))
 
-#-------------------------------------------------------------------------------
-
 func unset_node_from_collison(controller_name: String, area: Area3D):
 	var controller_ref = Globals.controllers[controller_name]
 	
 	if controller_ref.active_node \
 	and controller_ref.active_node.name == get_node_name_from_collider(area):
 		controller_ref.active_node = null
-
-#-------------------------------------------------------------------------------
-
-		#"7825ddcf-69aa-4ff4-b993-1867cf5bc51b": {
-			#"label": "Node D",
-			#"type": "common_cube",
-			#"color": "#AA4A44",
-			#"position": {
-				#"x": -0.05,
-				#"y": 0.2,
-				#"z": -0.01
-			#},
-			#"scales": {
-				#"label": 2,
-				#"node": 0.05
-			#},
-			#"edges": [
-				#"85d143e6-4567-4b53-9778-8f19946e9edc"
-			#]
-		#},
-
-
-func update_mindmap_data(reference_data, action_name):
-	var actual_mindmap = Globals.get_active_mindmap()
-	
-	match action_name:
-		"update-node":
-			var node_to_update = actual_mindmap.nodes[reference_data.name]
-	
-			#node_to_update.label = reference_node.label
-	
-			#node_to_update.type =  reference_node.type
-			#node_to_update.color =  reference_node.color
-			node_to_update.position = {
-				"x": reference_data.position.x,
-				"y": reference_data.position.y,
-				"z": reference_data.position.z
-				}
-			#node_to_update.scales = {
-				#"label": reference_node,
-				#"node": 0.05
-			#}
-		"add-node":
-			actual_mindmap.nodes[reference_data.key] = reference_data.value
-		"add-edge":
-			actual_mindmap.edges[reference_data.key] = {
-				"source": reference_data.source,
-				"target": reference_data.target
-			}
 
 #-------------------------------------------------------------------------------
 
@@ -121,6 +70,7 @@ func move_active_node(controller_name: String, controller_position: Vector3):
 	if not active_node_edges.is_empty():
 		move_active_node_edge(active_node_edges)
 
+#-------------------------------------------------------------------------------
 
 signal add_node(key, value)
 func add_new_node(controller_name: String, controller_position: Vector3):
@@ -149,10 +99,26 @@ func add_new_node(controller_name: String, controller_position: Vector3):
 	
 	update_mindmap_data({"key": new_node_key, "value": new_node_value}, "add-node")
 
+func remove_active_node(controller_name: String):
+	var node_name = Globals.controllers[controller_name].active_node.name
+	var node_instance = get_mindmap_node_by_name(node_name)
+	if node_instance: 
+		node_instance.queue_free()
+		Globals.controllers[controller_name].active_node = null
+	
+	var actual_mindmap = Globals.get_active_mindmap()
+	var edges_to_remove = actual_mindmap.nodes[node_name].edges
+	
+	for edge_id in edges_to_remove:
+		var edges_instance = get_mindmap_node_by_name(edge_id)
+		if edges_instance: edges_instance.queue_free()
+	
+	update_mindmap_data({
+		"node_to_remove": node_name,
+		"edges_to_remove": edges_to_remove
+	}, "remove-node")
 
 #-------------------------------------------------------------------------------
-
-	
 
 func update_node_connection(new_edge_data: Dictionary):
 	var start_node_instance = get_mindmap_node_by_name(new_edge_data.source)
@@ -168,6 +134,60 @@ func update_node_connection(new_edge_data: Dictionary):
 	if not end_node_edges.has(edge_id):
 		end_node_edges.append(edge_id)
 		end_node_instance.set_meta("edges", end_node_edges)
+		
+		#"7825ddcf-69aa-4ff4-b993-1867cf5bc51b": {
+			#"label": "Node D",
+			#"type": "common_cube",
+			#"color": "#AA4A44",
+			#"position": {
+				#"x": -0.05,
+				#"y": 0.2,
+				#"z": -0.01
+			#},
+			#"scales": {
+				#"label": 2,
+				#"node": 0.05
+			#},
+			#"edges": [
+				#"85d143e6-4567-4b53-9778-8f19946e9edc"
+			#]
+		#},
+
+func update_mindmap_data(reference_data, action_name):
+	var actual_mindmap = Globals.get_active_mindmap()
+	
+	match action_name:
+		"update-node":
+			var node_to_update = actual_mindmap.nodes[reference_data.name]
+	
+			#node_to_update.label = reference_node.label
+	
+			#node_to_update.type =  reference_node.type
+			#node_to_update.color =  reference_node.color
+			node_to_update.position = {
+				"x": reference_data.position.x,
+				"y": reference_data.position.y,
+				"z": reference_data.position.z
+				}
+			#node_to_update.scales = {
+				#"label": reference_node,
+				#"node": 0.05
+			#}
+		"add-node":
+			actual_mindmap.nodes[reference_data.key] = reference_data.value
+		"add-edge":
+			actual_mindmap.edges[reference_data.key] = {
+				"source": reference_data.source,
+				"target": reference_data.target
+			}
+		"remove-node":
+			if actual_mindmap.nodes.has(reference_data.node_to_remove):
+				actual_mindmap.nodes.erase(reference_data.node_to_remove)
+			for edge_id in reference_data.edges_to_remove:
+				if actual_mindmap.edges.has(edge_id):
+					actual_mindmap.edges.erase(edge_id)
+
+#-------------------------------------------------------------------------------
 
 signal add_edge(key, value)
 func verify_edge_action(controller_name: String, collision_guide: Array[Area3D]):
@@ -193,7 +213,6 @@ func verify_edge_action(controller_name: String, collision_guide: Array[Area3D])
 				update_node_connection(new_edge_data)
 				update_mindmap_data(new_edge_data, "add-edge")
 			break
-	
 
 #-------------------------------------------------------------------------------
 
@@ -213,7 +232,8 @@ func set_button_pressed(controller_name: String, action: String):
 
 	set_controller_offset(controller_name)
 	if not controller_ref.active_actions.has(action):
-		if action == "trigger_click":
+		if action == "trigger_click" and \
+		not controller_ref.active_actions.has("thumbstick_backward"):
 			if controller_ref.active_node:
 				controller_ref.node_connection.is_adding_edge = true
 				controller_ref.node_connection.start = controller_ref.active_node
@@ -223,8 +243,6 @@ func set_button_pressed(controller_name: String, action: String):
 			controller_ref.node_connection.end = null
 				
 		controller_ref.active_actions.append(action)
-
-#-------------------------------------------------------------------------------
 
 func unset_button_pressed(controller_name: String, action: String):
 	var controller_ref = Globals.controllers[controller_name]

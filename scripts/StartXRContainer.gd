@@ -30,12 +30,12 @@ func enable_passthrough_mode() -> void:
 	fb_passthrough = Engine.get_singleton("OpenXRFbPassthroughExtensionWrapper")
 	fb_passthrough.set_passthrough_filter(OpenXRFbPassthroughExtensionWrapper.PASSTHROUGH_FILTER_DISABLED)
 
-func _on_left_controller_button_pressed(action_name: String) -> void:
+func _on_controller_button_pressed(action_name: String, controller_name: String) -> void:
 	match action_name:
 		"grip_click":
-			Utils.set_button_pressed("LeftController", "grip_click")
+			Utils.set_button_pressed(controller_name, "grip_click")
 		"trigger_click":
-			Utils.set_button_pressed("LeftController", "trigger_click")
+			Utils.set_button_pressed(controller_name, "trigger_click")
 
 
 	#if action_name == "trigger_click" and left_controller_ray_cast.is_colliding():
@@ -47,37 +47,21 @@ func _on_left_controller_button_pressed(action_name: String) -> void:
 		# else:
 		#	update(collider.name)
 
-
-func _on_left_controller_button_released(action_name: String) -> void:
+func _on_controller_button_released(action_name: String, controller_name: String) -> void:
 	match action_name:
 		"grip_click":
-			Utils.unset_button_pressed("LeftController", "grip_click")
+			Utils.unset_button_pressed(controller_name, "grip_click")
 		"trigger_click":
-			Utils.unset_button_pressed("LeftController", "trigger_click")
-
-
-func _on_right_controller_button_pressed(action_name: String) -> void:
-	match action_name:
-		"grip_click":
-			Utils.set_button_pressed("RightController", "grip_click")
-		"trigger_click":
-			Utils.set_button_pressed("RightController", "trigger_click")
-	#if action_name == "trigger_click" and right_controller_ray_cast.is_colliding():
-	#	var collider = right_controller_ray_cast.get_collider()
-
-		# if true:
-		#	collider.update_value(right_controller_ray_cast.get_collision_point())
-		# else:
-		#	update(collider.name)
-
-
-func _on_right_controller_button_released(action_name: String) -> void:
-	match action_name:
-		"grip_click":
-			Utils.unset_button_pressed("RightController", "grip_click")
-		"trigger_click":
-			Utils.unset_button_pressed("RightController", "trigger_click")
-
+			Utils.unset_button_pressed(controller_name, "trigger_click")
 
 func _on_main_timer_timeout() -> void:
 	Saver.save_current_state()
+
+# https://docs.godotengine.org/en/stable/tutorials/xr/xr_action_map.html
+func _on_controller_thumbstick_changed(id: String, axis_value: Vector2, controller_name: String) -> void:
+	if id == "primary":
+		const THUMBSTICK_BACKWARD_THRESHOLD = -0.5
+		if axis_value.y <= THUMBSTICK_BACKWARD_THRESHOLD:
+			Utils.set_button_pressed(controller_name, "thumbstick_backward")
+		else:
+			Utils.unset_button_pressed(controller_name, "thumbstick_backward")

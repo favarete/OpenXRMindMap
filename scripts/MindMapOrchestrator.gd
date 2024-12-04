@@ -5,8 +5,8 @@ extends Node3D
 var initial_position_is_not_set = true
 
 const MESHES = {
-	"common_sphere": preload("res://meshes/common_sphere.obj"),
-	"common_cube": preload("res://meshes/common_cube.obj")
+	"common_sphere": preload("res://DefaultMeshes/common_sphere.obj"),
+	"common_cube": preload("res://DefaultMeshes/common_cube.obj")
 }
 
 func _ready() -> void:

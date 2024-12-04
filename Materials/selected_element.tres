@@ -1,0 +1,14 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://brqx33yekj7ch"]
+
+[ext_resource type="Shader" uid="uid://dwykbvjvx7bre" path="res://Shaders/perfect_outline.gdshader" id="1_j4frg"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_r680b"]
+transparency = 1
+albedo_color = Color(0, 1, 1, 0.392157)
+
+[resource]
+render_priority = 0
+next_pass = SubResource("StandardMaterial3D_r680b")
+shader = ExtResource("1_j4frg")
+shader_parameter/outline_color = Color(0, 0.764706, 1, 1)
+shader_parameter/outline_width = 10.0

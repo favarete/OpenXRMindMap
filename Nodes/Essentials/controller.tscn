@@ -1,7 +1,8 @@
-[gd_scene load_steps=11 format=3 uid="uid://cl2t6u6m20r0p"]
+[gd_scene load_steps=12 format=3 uid="uid://cl2t6u6m20r0p"]
 
 [ext_resource type="Script" uid="uid://d3pxooneotnmg" path="res://Scripts/Controller.gd" id="1_td7h1"]
 [ext_resource type="Script" uid="uid://jpthj33k3384" path="res://Scripts/ControllerRaycast.gd" id="1_ub723"]
+[ext_resource type="Shader" uid="uid://dwykbvjvx7bre" path="res://Shaders/perfect_outline.gdshader" id="3_sjvan"]
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_qcj6j"]
 top_radius = 0.005
@@ -12,15 +13,13 @@ shading_mode = 0
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_td7h1"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_td7h1"]
-cull_mode = 1
-shading_mode = 0
-albedo_color = Color(0, 0, 0, 1)
-grow = true
-grow_amount = 0.1
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_gbk40"]
+render_priority = 0
+shader = ExtResource("3_sjvan")
+shader_parameter/outline_color = null
+shader_parameter/outline_width = 10.0
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sjvan"]
-next_pass = SubResource("StandardMaterial3D_td7h1")
 transparency = 1
 albedo_color = Color(1, 1, 1, 0.588235)
 metallic_specular = 0.0
@@ -65,6 +64,7 @@ shape = SubResource("SphereShape3D_td7h1")
 
 [node name="VisualFeedback" type="MeshInstance3D" parent="Guide"]
 transform = Transform3D(0.001, 0, 0, 0, 0.001, 0, 0, 0, 0.001, 0, 0, 0)
+material_overlay = SubResource("ShaderMaterial_gbk40")
 mesh = SubResource("SphereMesh_gbk40")
 skeleton = NodePath("../..")
 

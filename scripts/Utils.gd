@@ -34,18 +34,27 @@ func get_node_name_from_collider(area: Area3D):
 	
 #-------------------------------------------------------------------------------
 
+const material_hovered = preload("res://Materials/hovered_element.tres")
+const material_selected = preload("res://Materials/selected_element.tres")
+
 func set_node_from_collison(controller_name: String, area: Area3D):
 	var controller_ref = Globals.controllers[controller_name]
 	
 	if not controller_ref.active_node:
-		controller_ref.active_node = get_mindmap_node_by_name(get_node_name_from_collider(area))
+		var active_node = get_mindmap_node_by_name(get_node_name_from_collider(area))
+		active_node.material_overlay = material_hovered
+		controller_ref.active_node = active_node
 
 func unset_node_from_collison(controller_name: String, area: Area3D):
 	var controller_ref = Globals.controllers[controller_name]
 	
+	var active_node_name = get_node_name_from_collider(area)
+	
 	if controller_ref.active_node \
-	and controller_ref.active_node.name == get_node_name_from_collider(area):
+	and controller_ref.active_node.name == active_node_name:
 		controller_ref.active_node = null
+		var active_node = get_mindmap_node_by_name(active_node_name)
+		active_node.material_overlay = null
 
 #-------------------------------------------------------------------------------
 

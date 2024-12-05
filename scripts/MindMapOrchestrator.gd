@@ -99,6 +99,14 @@ func create_node(key, value):
 		var collision_shape = get_basic_collision_shapes(value.type, node)
 		area.add_child(collision_shape)
 		
+		var tween = create_tween().bind_node(node)
+		var scale_in_vector = node.scale * (Vector3.ONE * 1.1)
+		tween.tween_property(node, "scale", scale_in_vector, 
+			Globals.TWEEN_CONSTRUCTION_DELAY).set_ease(Tween.EASE_IN)
+		tween.tween_property(node, "scale", node.scale, 
+			Globals.TWEEN_CONSTRUCTION_DELAY).set_ease(Tween.EASE_OUT)
+		tween.tween_callback(func (): tween.kill())
+		
 		# Add label above the node
 		if value.label != "":
 			var label = create_label(value)

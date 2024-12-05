@@ -111,8 +111,14 @@ func add_new_node(controller_name: String, controller_position: Vector3):
 func remove_active_node(controller_name: String):
 	var node_name = Globals.controllers[controller_name].active_node.name
 	var node_instance = get_mindmap_node_by_name(node_name)
-	if node_instance: 
-		node_instance.queue_free()
+	if node_instance:
+		var tween = create_tween().bind_node(node_instance)
+		var scale_in_vector = node_instance.scale * (Vector3.ONE * 1.1)
+		tween.tween_property(node_instance, "scale", scale_in_vector, 
+			Globals.TWEEN_CONSTRUCTION_DELAY).set_ease(Tween.EASE_IN)
+		tween.tween_property(node_instance, "scale", Vector3.ONE * 0.001, 
+			Globals.TWEEN_CONSTRUCTION_DELAY).set_ease(Tween.EASE_OUT)
+		tween.tween_callback(func (): node_instance.queue_free())
 		Globals.controllers[controller_name].active_node = null
 	
 	var actual_mindmap = Globals.get_active_mindmap()

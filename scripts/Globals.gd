@@ -2,6 +2,7 @@ extends Node
 
 # Timw without action before autosave
 const SAVE_DELAY := 1
+const TWEEN_CONSTRUCTION_DELAY = 0.1
 
 # Collisoon Layers
 const CONTROLLER_LAYER := 1
@@ -46,19 +47,9 @@ func connection_is_new(uuid1: String, uuid2: String) -> bool:
 
 #-------------------------------------------------------------------------------
 
-var controllers = {
-	"LeftController": {
+var CONTROLLER_PROPS = {
 		"active_node": null,
-		"offset": Vector3.ZERO,
-		"active_actions": [],
-		"node_connection": {
-			"is_adding_edge": false,
-			"start": null,
-			"end": null
-		}
-	},
-	"RightController": {
-		"active_node": null,
+		"active_node_selected": false,
 		"offset": Vector3.ZERO,
 		"active_actions": [],
 		"node_connection": {
@@ -67,4 +58,8 @@ var controllers = {
 			"end": null
 		}
 	}
+	
+var controllers = {
+	"LeftController": CONTROLLER_PROPS.duplicate(true),
+	"RightController": CONTROLLER_PROPS.duplicate(true)
 }

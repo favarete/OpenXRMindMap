@@ -1,6 +1,6 @@
 extends Node
 
-const uuid_util = preload('res://Scripts/uuid.gd')
+var uuid_util = load('res://Scripts/uuid.gd')
 
 #-------------------------------------------------------------------------------
 
@@ -34,8 +34,8 @@ func get_node_name_from_collider(area: Area3D):
 	
 #-------------------------------------------------------------------------------
 
-const material_hovered = preload("res://Materials/hovered_element.tres")
-const material_selected = preload("res://Materials/selected_element.tres")
+var material_hovered = load("res://Materials/hovered_element.tres")
+var material_selected = load("res://Materials/selected_element.tres")
 
 func set_node_from_collison(controller_name: String, area: Area3D):
 	var controller_ref = Globals.controllers[controller_name]
@@ -83,10 +83,10 @@ func move_active_node(controller_name: String, controller_position: Vector3):
 
 signal add_node(key, value)
 func add_new_node(controller_name: String, controller_position: Vector3):
-	var controller_ref = Globals.controllers[controller_name]
+	#var controller_ref = Globals.controllers[controller_name]
 	
 	var new_node_key = uuid_util.v4()
-	var adjusted_controller_position = controller_position + controller_ref.offset
+	#var adjusted_controller_position = controller_position + controller_ref.offset
 	var new_node_value = {
 		"label": Globals.DEFAULT_LABEL_TEXT,
 		"type": Globals.DEFAULT_NODE_TYPE,

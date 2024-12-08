@@ -20,7 +20,7 @@ func _on_interactive_element_exited(area: Area3D) -> void:
 #-------------------------------------------------------------------------------
 
 func get_local_position():
-	var position_tracker = sphere_guide.global_transform.origin
+#	var position_tracker = sphere_guide.global_transform.origin
 	return mind_map_container.to_local(sphere_guide.global_transform.origin)
 
 #-------------------------------------------------------------------------------
@@ -76,7 +76,7 @@ func reset_visual_feedback():
 
 #-------------------------------------------------------------------------------
 
-func _process(delta):
+func _process(_delta):
 	if in_delete_position():
 		if valid_delete_node_action():
 			Utils.remove_active_node(controller_name)

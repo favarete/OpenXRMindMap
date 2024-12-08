@@ -1,8 +1,9 @@
 [gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://u7p353qtvhch"]
 
-[ext_resource type="Shader" uid="uid://dwykbvjvx7bre" path="res://Shaders/perfect_outline.gdshader" id="1_hpl83"]
+[ext_resource type="Shader" uid="uid://cx7bo83hducdb" path="res://Shaders/perfect_outline.gdshader" id="1_hpl83"]
 
 [resource]
+resource_local_to_scene = true
 render_priority = 0
 shader = ExtResource("1_hpl83")
 shader_parameter/outline_color = Color(0, 0.952941, 1, 1)

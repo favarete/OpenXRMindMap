@@ -1,9 +1,8 @@
-[gd_scene load_steps=8 format=3 uid="uid://cyfhw445f4w0v"]
+[gd_scene load_steps=7 format=3 uid="uid://cyfhw445f4w0v"]
 
-[ext_resource type="Script" uid="uid://b4dyvqahgjrym" path="res://Scripts/StartXRContainer.gd" id="1_2o5qn"]
-[ext_resource type="Script" uid="uid://c60red3ohxuu0" path="res://Scripts/MindMapOrchestrator.gd" id="2_d2soe"]
+[ext_resource type="Script" uid="uid://dmjeiue1s30f2" path="res://Scripts/StartXRContainer.gd" id="1_2o5qn"]
+[ext_resource type="Script" uid="uid://i2am4w81aelr" path="res://Scripts/MindMapOrchestrator.gd" id="2_d2soe"]
 [ext_resource type="PackedScene" uid="uid://cl2t6u6m20r0p" path="res://Nodes/Essentials/controller.tscn" id="2_h572j"]
-[ext_resource type="Script" uid="uid://c4ioou6o3o1ow" path="res://Scripts/OpenXRFBPassthroughGeometry.gd" id="3_s0j7b"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_tvdja"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -57,8 +56,9 @@ transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 0, 0, 0)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5)
 script = ExtResource("2_d2soe")
 
-[node name="OpenXRFbPassthroughGeometry" type="OpenXRFbPassthroughGeometry" parent="XROrigin3D"]
-script = ExtResource("3_s0j7b")
+[node name="Label3D" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.684048)
+text = "text"
 
 [connection signal="timeout" from="MainTimer" to="." method="_on_main_timer_timeout"]
 [connection signal="button_pressed" from="XROrigin3D/LeftController" to="." method="_on_controller_button_pressed" binds= ["LeftController"]]

@@ -6,7 +6,7 @@ var countdown_to_recenter_hmd: int = 3
 @onready var world_environment: WorldEnvironment = $WorldEnvironment
 @onready var left_controller_ray_cast: RayCast3D = $XROrigin3D/LeftController/Controller/ControllerRayCast
 @onready var right_controller_ray_cast: RayCast3D = $XROrigin3D/RightController/Controller/ControllerRayCast
-@onready var passthrough_geometry: OpenXRFbPassthroughGeometry = $XROrigin3D/OpenXRFbPassthroughGeometry
+@onready var debug_text := $Label3D
 
 
 func _ready() -> void:
@@ -25,12 +25,13 @@ func enable_passthrough_mode() -> void:
 	world_environment.environment.background_mode = Environment.BG_COLOR
 	world_environment.environment.background_color = Color(0.0, 0.0, 0.0, 0.0)
 	xr_interface.environment_blend_mode = XRInterface.XR_ENV_BLEND_MODE_ALPHA_BLEND
-	passthrough_geometry.hide()
+#	passthrough_geometry.hide()
 	
 	fb_passthrough = Engine.get_singleton("OpenXRFbPassthroughExtensionWrapper")
 	fb_passthrough.set_passthrough_filter(OpenXRFbPassthroughExtensionWrapper.PASSTHROUGH_FILTER_DISABLED)
 
 func _on_controller_button_pressed(action_name: String, controller_name: String) -> void:
+	debug_text.set_text("action_name: {action_name}, controller_name: {controller_name}.".format({"action_name": action_name, "controller_name": controller_name}))
 	match action_name:
 		"grip_click":
 			Utils.set_button_pressed(controller_name, "grip_click")

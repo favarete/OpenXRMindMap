@@ -2,7 +2,7 @@ extends RayCast3D
 
 @onready var mesh_instance_3d: MeshInstance3D = $MeshInstance3D
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	var mat = mesh_instance_3d.get_surface_override_material(0)
 
 	if not is_colliding():

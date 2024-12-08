@@ -4,9 +4,9 @@ extends Node3D
 
 var initial_position_is_not_set = true
 
-const MESHES = {
-	"common_sphere": preload("res://DefaultMeshes/common_sphere.obj"),
-	"common_cube": preload("res://DefaultMeshes/common_cube.obj")
+var MESHES = {
+	"common_sphere": load("res://DefaultMeshes/common_sphere.obj"),
+	"common_cube": load("res://DefaultMeshes/common_cube.obj")
 }
 
 func _ready() -> void:
@@ -144,7 +144,7 @@ func create_immediate_mesh_line(
 	):
 	# Calculate the direction vector and length
 	var direction = end_pos - start_pos
-	var length = direction.length()
+	#var length = direction.length()
 	var normalized_dir = -direction.normalized()
 
 	# Calculate orthogonal vectors for creating the circular cross-section
@@ -220,7 +220,7 @@ func update_thick_line(line: MeshInstance3D, start_pos: Vector3, end_pos: Vector
 	#initial_position_is_not_set = false
 
 
-func _process(delta):
+func _process(_delta):
 	if camera:
 		#if initial_position_is_not_set:
 			#set_initial_position()
@@ -238,7 +238,7 @@ func _process(delta):
 				up = Vector3(0, 0, 1)
 #
 			## Apply the transform safely
-			label.transform = Transform3D(Basis().looking_at(direction, up), label.position)
+			label.transform = Transform3D(Basis.looking_at(direction, up), label.position)
 
 
 func create_material(hex_color: String):

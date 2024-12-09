@@ -6,8 +6,6 @@ var countdown_to_recenter_hmd: int = 3
 @onready var world_environment: WorldEnvironment = $WorldEnvironment
 @onready var left_controller_ray_cast: RayCast3D = $XROrigin3D/LeftController/Controller/ControllerRayCast
 @onready var right_controller_ray_cast: RayCast3D = $XROrigin3D/RightController/Controller/ControllerRayCast
-@onready var debug_text := $Label3D
-
 
 func _ready() -> void:
 	super._ready()
@@ -31,13 +29,11 @@ func enable_passthrough_mode() -> void:
 	fb_passthrough.set_passthrough_filter(OpenXRFbPassthroughExtensionWrapper.PASSTHROUGH_FILTER_DISABLED)
 
 func _on_controller_button_pressed(action_name: String, controller_name: String) -> void:
-	debug_text.set_text("action_name: {action_name}, controller_name: {controller_name}.".format({"action_name": action_name, "controller_name": controller_name}))
 	match action_name:
 		"grip_click":
 			Utils.set_button_pressed(controller_name, "grip_click")
 		"trigger_click":
 			Utils.set_button_pressed(controller_name, "trigger_click")
-
 
 	#if action_name == "trigger_click" and left_controller_ray_cast.is_colliding():
 	#	var collider = left_controller_ray_cast.get_collider()
@@ -66,3 +62,12 @@ func _on_controller_thumbstick_changed(id: String, axis_value: Vector2, controll
 			Utils.set_button_pressed(controller_name, "thumbstick_backward")
 		else:
 			Utils.unset_button_pressed(controller_name, "thumbstick_backward")
+			
+		if axis_value.y > 0.5:
+			print("-\n\n****************** DEBUG START ******************")
+			var controller_ref = Globals.controllers[controller_name]
+			print("---------------- active_node")
+			print(controller_name, ": ", controller_ref.active_node)
+			print("---------------- group_collision.collisions")
+			print(controller_name, ": ", controller_ref.group_collision.collisions)
+			print("****************** DEBUG END ********************\n\n-")

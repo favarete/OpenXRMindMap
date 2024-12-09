@@ -3,6 +3,7 @@ extends Node3D
 #-------------------------------------------------------------------------------
 
 @onready var controller_name = get_parent().name
+@onready var controller_ref = Globals.controllers[get_parent().name]
 @onready var main_timer = Utils.get_main_timer()
 @onready var sphere_guide := $Guide/MainSphere
 @onready var visual_feedback := $Guide/VisualFeedback
@@ -26,32 +27,24 @@ func get_local_position():
 #-------------------------------------------------------------------------------
 
 func valid_movement_action():
-	var controller_ref = Globals.controllers[controller_name]
-	
 	var check_conditions = controller_ref.active_node \
 	and controller_ref.active_actions.has("grip_click")
 	
 	return check_conditions
 
 func valid_add_node_action():
-	var controller_ref = Globals.controllers[controller_name]
-	
 	var check_conditions = not controller_ref.active_node \
 	and controller_ref.active_actions.has("trigger_click")
 	
 	return check_conditions
 	
 func in_delete_position() -> bool:
-	var controller_ref = Globals.controllers[controller_name]
-	
 	var check_conditions = controller_ref.active_node \
 	and controller_ref.active_actions.has("thumbstick_backward")
 	
 	return check_conditions
 	
 func valid_delete_node_action() -> bool:
-	var controller_ref = Globals.controllers[controller_name]
-	
 	var check_conditions = controller_ref.active_node \
 	and controller_ref.active_actions.has("thumbstick_backward") \
 	and controller_ref.active_actions.has("trigger_click")
@@ -59,7 +52,6 @@ func valid_delete_node_action() -> bool:
 	return check_conditions
 
 func performing_creation():
-	var controller_ref = Globals.controllers[controller_name]
 	return controller_ref.active_actions.has("trigger_click")
 
 #-------------------------------------------------------------------------------
@@ -102,3 +94,18 @@ func _process(_delta):
 		else:
 			if main_timer.is_stopped():
 				main_timer.start(Globals.SAVE_DELAY)
+
+		var collisions_length = controller_ref.group_collision.collisions.size()
+		if collisions_length == 0:
+			Utils.set_active_node(controller_name, null)
+		elif collisions_length == 1:
+			Utils.set_active_node(controller_name, controller_ref.group_collision.collisions[0])
+		else:
+			var closest_sphere = null
+			var closest_distance = INF
+			for sphere in controller_ref.group_collision.collisions:
+				var distance = sphere_guide.global_transform.origin.distance_to(sphere.global_transform.origin)
+				if distance < closest_distance:
+					closest_distance = distance
+					closest_sphere = sphere
+			Utils.set_active_node(controller_name, closest_sphere)

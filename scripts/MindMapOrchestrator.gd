@@ -10,37 +10,45 @@ var MESHES = {
 }
 
 func _ready() -> void:
-	load_graph("user://new_data.json")
+	load_graph()
 	Utils.connect("update_edge", Callable(self, "update_thick_line"))
 	Utils.connect("add_node", Callable(self, "create_node"))
 	Utils.connect("add_edge", Callable(self, "create_edge"))
 
+func create_save_file():
+	var file = FileAccess.open(Globals.SAVE_FILE, FileAccess.WRITE)
+	var content = { "title": "My First Mind Map", "nodes": {}, "edges": {}}
 
-func load_graph(json_file_path: String):
-	var json_file = FileAccess.open(json_file_path, FileAccess.READ)
-	if not json_file:
-		print("Failed to open JSON file.")
-		return
+	file.store_string(JSON.stringify(content))
 	
-	var json_text = json_file.get_as_text()
-	var json_result = JSON.parse_string(json_text)
+func load_from_file():
+	var file = FileAccess.open(Globals.SAVE_FILE, FileAccess.READ)
+	var content = file.get_as_text()
+	return JSON.parse_string(content)
+
+func load_graph():
+	if not FileAccess.file_exists(Globals.SAVE_FILE):
+		create_save_file()
 	
-	if json_result is Dictionary:
-		Globals.set_active_mindmap(json_result) 
-		build_graph(json_result)
+	var json_file = load_from_file()
+	
+	if json_file is Dictionary:
+		Globals.set_active_mindmap(json_file) 
+		build_graph(json_file)
 	else:
 		print("Failed to parse JSON. Ensure the file format is correct.")
 		return
 
 
 func build_graph(graph_data):
-	for key in graph_data.nodes.keys():
-		var value = graph_data.nodes[key]
-		create_node(key, value)
-	
-	for key in graph_data.edges.keys():
-		var value = graph_data.edges[key]
-		create_edge(key, value)
+	if graph_data:
+		for key in graph_data.nodes.keys():
+			var value = graph_data.nodes[key]
+			create_node(key, value)
+		
+		for key in graph_data.edges.keys():
+			var value = graph_data.edges[key]
+			create_edge(key, value)
 
 
 func get_basic_collision_shapes(mesh_type, node_instance):
@@ -86,6 +94,7 @@ func create_node(key, value):
 			value.position.z
 			)
 			
+		node.set_script(load("res://Scripts/MapNodeInstance.gd"))
 		add_child(node)
 		
 		# Adicionar um Area3D ao nó
@@ -218,7 +227,6 @@ func update_thick_line(line: MeshInstance3D, start_pos: Vector3, end_pos: Vector
 	#for child in get_children():
 		#child.position += camera_position
 	#initial_position_is_not_set = false
-
 
 func _process(_delta):
 	if camera:

@@ -34,27 +34,24 @@ func get_node_name_from_collider(area: Area3D):
 	
 #-------------------------------------------------------------------------------
 
-var material_hovered = load("res://Materials/hovered_element.tres")
-var material_selected = load("res://Materials/selected_element.tres")
+func set_active_node(controller_name: String, node_instance: MeshInstance3D) -> void:
+	var controller_ref = Globals.controllers[controller_name]
+	controller_ref.active_node = node_instance
 
 func set_node_from_collison(controller_name: String, area: Area3D):
 	var controller_ref = Globals.controllers[controller_name]
+	var new_collision = get_mindmap_node_by_name(get_node_name_from_collider(area))
 	
-	if not controller_ref.active_node:
-		var active_node = get_mindmap_node_by_name(get_node_name_from_collider(area))
-		active_node.material_overlay = material_hovered
-		controller_ref.active_node = active_node
+	if not controller_ref.group_collision.collisions.has(new_collision):
+		controller_ref.group_collision.collisions.append(new_collision)
 
 func unset_node_from_collison(controller_name: String, area: Area3D):
 	var controller_ref = Globals.controllers[controller_name]
 	
-	var active_node_name = get_node_name_from_collider(area)
+	var node_ref = get_mindmap_node_by_name(get_node_name_from_collider(area))
 	
-	if controller_ref.active_node \
-	and controller_ref.active_node.name == active_node_name:
-		controller_ref.active_node = null
-		var active_node = get_mindmap_node_by_name(active_node_name)
-		active_node.material_overlay = null
+	if controller_ref.group_collision.collisions.has(node_ref):
+		controller_ref.group_collision.collisions.erase(node_ref)
 
 #-------------------------------------------------------------------------------
 
@@ -200,6 +197,14 @@ func update_mindmap_data(reference_data, action_name):
 				actual_mindmap.nodes.erase(reference_data.node_to_remove)
 			for edge_id in reference_data.edges_to_remove:
 				if actual_mindmap.edges.has(edge_id):
+					var source_node_id = actual_mindmap.edges[edge_id].source
+					var target_node_id = actual_mindmap.edges[edge_id].target
+					
+					var node_to_clean = source_node_id \
+						if reference_data.node_to_remove == target_node_id else target_node_id
+					if actual_mindmap.nodes.has(node_to_clean):
+						actual_mindmap.nodes[node_to_clean].edges.erase(edge_id)
+			
 					actual_mindmap.edges.erase(edge_id)
 
 #-------------------------------------------------------------------------------

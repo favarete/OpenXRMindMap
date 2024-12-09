@@ -16,7 +16,7 @@ func _thread_function():
 		
 		var actual_mindmap = Globals.get_active_mindmap()
 		var content = JSON.stringify(actual_mindmap)
-		var file = FileAccess.open("user://new_data.json", FileAccess.WRITE)
+		var file = FileAccess.open(Globals.SAVE_FILE, FileAccess.WRITE)
 		file.store_string(content)
 		
 		mutex.unlock()

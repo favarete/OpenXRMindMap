@@ -1,6 +1,7 @@
 extends Node
 
-# Timw without action before autosave
+# Time without action before autosave
+const SAVE_FILE = "user://oxrmindmap_save.json"
 const SAVE_DELAY := 1
 const TWEEN_CONSTRUCTION_DELAY = 0.1
 
@@ -26,12 +27,12 @@ var DEFAULT_EDGE_MATERIAL: StandardMaterial3D = null
 
 #-------------------------------------------------------------------------------
 
-var LoadedMindMap = null
+var LoadedMindMap
 
 func set_active_mindmap(mindmap_data):
 	LoadedMindMap = mindmap_data
 	
-func get_active_mindmap() -> Dictionary:
+func get_active_mindmap():
 	return LoadedMindMap
 	
 
@@ -56,6 +57,10 @@ var CONTROLLER_PROPS = {
 			"is_adding_edge": false,
 			"start": null,
 			"end": null
+		},
+		"group_collision": {
+			"is_group_colliding": false,
+			"collisions": []
 		}
 	}
 	

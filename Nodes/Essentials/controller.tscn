@@ -1,6 +1,6 @@
 [gd_scene load_steps=12 format=3 uid="uid://cl2t6u6m20r0p"]
 
-[ext_resource type="Script" uid="uid://xxlo4v8auik6" path="res://Scripts/controller.gd" id="1_td7h1"]
+[ext_resource type="Script" path="res://Scripts/controller.gd" id="1_td7h1"]
 [ext_resource type="Script" uid="uid://dho0olybbgrah" path="res://Scripts/ControllerRaycast.gd" id="1_ub723"]
 [ext_resource type="Shader" uid="uid://cx7bo83hducdb" path="res://Shaders/perfect_outline.gdshader" id="3_sjvan"]
 
@@ -59,7 +59,6 @@ monitorable = false
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
 transform = Transform3D(0.06, 0, 0, 0, 0.06, 0, 0, 0, 0.06, 0, 0, 0)
 shape = SubResource("SphereShape3D_td7h1")
-debug_color = Color(0, 0.6, 0.7, 0.42)
 
 [node name="Guide" type="Node3D" parent="."]
 

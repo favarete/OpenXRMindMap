@@ -1,31 +1,27 @@
 extends Node
 
-var uuid_util = load('res://Scripts/uuid.gd')
+func get_main_timer() -> Timer:
+	var path_to_node: String = "StartXR/MainTimer"
+	var root: Window = get_root()
+	return root.get_node(path_to_node) if root.has_node(path_to_node) else null
 
-#-------------------------------------------------------------------------------
+func get_mind_map_container() -> Node3D:
+	var path_to_node: String = "StartXR/XROrigin3D/MindMapContainer"
+	var root: Window = get_root()
+	return root.get_node(path_to_node) if root.has_node(path_to_node) else null
 
-func get_main_timer() -> Node:
-	var path_to_node = "StartXR/MainTimer"
-	return get_node_by_path(path_to_node)
+func get_mindmap_node_by_name(node_name: String) -> MeshInstance3D:
+	var path_to_node: String = "StartXR/XROrigin3D/MindMapContainer/" + node_name
+	var root: Window = get_root()
+	return root.get_node(path_to_node) if root.has_node(path_to_node) else null
 
-func get_mind_map_container() -> Node:
-	var path_to_node = "StartXR/XROrigin3D/MindMapContainer"
-	return get_node_by_path(path_to_node)
-
-func get_mindmap_node_by_name(node_name: String) -> Node:
-	var path_to_node = "StartXR/XROrigin3D/MindMapContainer/" + node_name
-	return get_node_by_path(path_to_node)
-
-func get_controller_node_by_name(controller_name: String) -> Node:
-	var path_to_node = "StartXR/XROrigin3D/" + controller_name
-	return get_node_by_path(path_to_node)
+func get_controller_node_by_name(controller_name: String) -> XRController3D:
+	var path_to_node: String = "StartXR/XROrigin3D/" + controller_name
+	var root: Window = get_root()
+	return root.get_node(path_to_node) if root.has_node(path_to_node) else null
 		
-func get_node_by_path(path_to_node):
-	var root = get_tree().root
-	if root.has_node(path_to_node):
-		return root.get_node(path_to_node)
-	else:
-		return null
+func get_root() -> Window:
+	return get_tree().root
 
 #-------------------------------------------------------------------------------
 
@@ -82,7 +78,7 @@ signal add_node(key, value)
 func add_new_node(controller_name: String, controller_position: Vector3):
 	#var controller_ref = Globals.controllers[controller_name]
 	
-	var new_node_key = uuid_util.v4()
+	var new_node_key = UniqueUserID.v4()
 	#var adjusted_controller_position = controller_position + controller_ref.offset
 	var new_node_value = {
 		"label": Globals.DEFAULT_LABEL_TEXT,
@@ -106,29 +102,30 @@ func add_new_node(controller_name: String, controller_position: Vector3):
 	update_mindmap_data({"key": new_node_key, "value": new_node_value}, "add-node")
 
 func remove_active_node(controller_name: String):
-	var node_name = Globals.controllers[controller_name].active_node.name
-	var node_instance = get_mindmap_node_by_name(node_name)
-	if node_instance:
-		var tween = create_tween().bind_node(node_instance)
-		var scale_in_vector = node_instance.scale * (Vector3.ONE * 1.1)
-		tween.tween_property(node_instance, "scale", scale_in_vector, 
-			Globals.TWEEN_CONSTRUCTION_DELAY).set_ease(Tween.EASE_IN)
-		tween.tween_property(node_instance, "scale", Vector3.ONE * 0.001, 
-			Globals.TWEEN_CONSTRUCTION_DELAY).set_ease(Tween.EASE_OUT)
-		tween.tween_callback(func (): node_instance.queue_free())
-		Globals.controllers[controller_name].active_node = null
-	
-	var actual_mindmap = Globals.get_active_mindmap()
-	var edges_to_remove = actual_mindmap.nodes[node_name].edges
-	
-	for edge_id in edges_to_remove:
-		var edges_instance = get_mindmap_node_by_name(edge_id)
-		if edges_instance: edges_instance.queue_free()
-	
-	update_mindmap_data({
-		"node_to_remove": node_name,
-		"edges_to_remove": edges_to_remove
-	}, "remove-node")
+	if is_instance_valid(Globals.controllers[controller_name].active_node):
+		var node_name = Globals.controllers[controller_name].active_node.name
+		var node_instance = get_mindmap_node_by_name(node_name)
+		if node_instance:
+			var tween = create_tween().bind_node(node_instance)
+			var scale_in_vector = node_instance.scale * (Vector3.ONE * 1.1)
+			tween.tween_property(node_instance, "scale", scale_in_vector, 
+				Globals.TWEEN_CONSTRUCTION_DELAY).set_ease(Tween.EASE_IN)
+			tween.tween_property(node_instance, "scale", Vector3.ONE * 0.001, 
+				Globals.TWEEN_CONSTRUCTION_DELAY).set_ease(Tween.EASE_OUT)
+			tween.tween_callback(func (): node_instance.queue_free())
+			Globals.controllers[controller_name].active_node = null
+		
+		var actual_mindmap = Globals.get_active_mindmap()
+		var edges_to_remove = actual_mindmap.nodes[node_name].edges
+		
+		for edge_id in edges_to_remove:
+			var edges_instance = get_mindmap_node_by_name(edge_id)
+			if edges_instance: edges_instance.queue_free()
+		
+		update_mindmap_data({
+			"node_to_remove": node_name,
+			"edges_to_remove": edges_to_remove
+		}, "remove-node")
 
 #-------------------------------------------------------------------------------
 
@@ -219,7 +216,7 @@ func verify_edge_action(controller_name: String, collision_guide: Array[Area3D])
 		if start_connection != end_connection:
 			unset_button_pressed(controller_name, "trigger_click")
 			if Globals.connection_is_new(start_connection, end_connection):
-				var new_edge_key = uuid_util.v4()
+				var new_edge_key = UniqueUserID.v4()
 				
 				var new_edge_data = {
 					"source": start_connection, 
@@ -238,7 +235,7 @@ func verify_edge_action(controller_name: String, collision_guide: Array[Area3D])
 
 func set_controller_offset(controller_name: String):
 	var controller_ref = Globals.controllers[controller_name]
-	if controller_ref.active_node:
+	if is_instance_valid(controller_ref.active_node):
 		var node_position = controller_ref.active_node.global_transform.origin
 		var controller_instance = get_controller_node_by_name(controller_name)
 		var controller_collider = controller_instance.get_node("Controller/Guide/MainSphere")

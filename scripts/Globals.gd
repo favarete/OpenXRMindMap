@@ -1,46 +1,47 @@
 extends Node
 
 # Time without action before autosave
-const SAVE_FILE = "user://oxrmindmap_save.json"
-const SAVE_DELAY := 1
-const TWEEN_CONSTRUCTION_DELAY = 0.1
+const SAVE_FILE: String = "user://oxrmindmap_save.json"
+const SAVE_DELAY: int = 1
+const TWEEN_CONSTRUCTION_DELAY: float = 0.1
 
 # Collisoon Layers
-const CONTROLLER_LAYER := 1
-const NODE_LAYER := 2
-const LABEL_LAYER := 3
-const CONNECTION_LAYER := 4
-const MENU_LAYER := 5
-const KEYBOARD_LAYER := 6
+const CONTROLLER_LAYER: float = 1
+const NODE_LAYER: int = 2
+const LABEL_LAYER: int = 3
+const CONNECTION_LAYER: int = 4
+const MENU_LAYER: int = 5
+const KEYBOARD_LAYER: int = 6
 
 # Default Values
-const DEFAULT_EDGE_RADIUS := 0.002
-const DEFAULT_EDGE_SEGMENTS := 32
-const DEFAULT_NODE_TYPE := "common_sphere"
-const DEFAULT_NODE_COLOR := "#FFFFFF"
-const DEFAULT_NODE_SCALE := 0.05
-const DEFAULT_LABEL_TEXT := ""
-const DEFAULT_LABEL_SCALE := 1
+const DEFAULT_EDGE_RADIUS: float = 0.001
+const DEFAULT_EDGE_SEGMENTS: int = 32
+const DEFAULT_NODE_TYPE: String = "common_sphere"
+const DEFAULT_NODE_COLOR: String = "#FFFFFF"
+const DEFAULT_NODE_SCALE: float = 0.05
+const DEFAULT_LABEL_TEXT: String = ""
+const DEFAULT_LABEL_SCALE: int = 1
 
 # GLobal Placeholders
 var DEFAULT_EDGE_MATERIAL: StandardMaterial3D = null
 
 #-------------------------------------------------------------------------------
 
-var LoadedMindMap
+var LoadedMindMap: Dictionary
 
-func set_active_mindmap(mindmap_data):
+func set_active_mindmap(mindmap_data: Dictionary) -> void:
 	LoadedMindMap = mindmap_data
 	
-func get_active_mindmap():
+func get_active_mindmap() -> Dictionary:
 	return LoadedMindMap
 	
 
 func connection_is_new(uuid1: String, uuid2: String) -> bool:
-	var actual_mindmap = get_active_mindmap()
+	var actual_mindmap: Dictionary = get_active_mindmap()
+	var actual_mindmap_edges: Dictionary = actual_mindmap.edges
 	
-	for key in actual_mindmap.edges.keys():
-		var entry = actual_mindmap.edges[key]
+	for key: String in actual_mindmap_edges.keys():
+		var entry: Dictionary = actual_mindmap.edges[key]
 		if (entry["source"] == uuid1 and entry["target"] == uuid2) or \
 		   (entry["source"] == uuid2 and entry["target"] == uuid1):
 			return false
@@ -48,7 +49,7 @@ func connection_is_new(uuid1: String, uuid2: String) -> bool:
 
 #-------------------------------------------------------------------------------
 
-var CONTROLLER_PROPS = {
+var CONTROLLER_PROPS: Dictionary = {
 		"active_node": null,
 		"active_node_selected": false,
 		"offset": Vector3.ZERO,
@@ -64,7 +65,7 @@ var CONTROLLER_PROPS = {
 		}
 	}
 	
-var controllers = {
+var controllers: Dictionary = {
 	"LeftController": CONTROLLER_PROPS.duplicate(true),
 	"RightController": CONTROLLER_PROPS.duplicate(true)
 }

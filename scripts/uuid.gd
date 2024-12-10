@@ -1,10 +1,11 @@
 # Note: The code might not be as pretty it could be, since it's written
 # in a way that maximizes performance. Methods are inlined and loops are avoided.
+class_name UUID
 extends Node
 
 const BYTE_MASK: int = 0b11111111
 
-static func uuidbin():
+static func uuidbin() -> Array[int]:
 	randomize()
 	# 16 random bytes with the bytes on index 6 and 8 modified
 	return [
@@ -14,7 +15,7 @@ static func uuidbin():
 		randi() & BYTE_MASK, randi() & BYTE_MASK, randi() & BYTE_MASK, randi() & BYTE_MASK,
 	]
 
-static func uuidbinrng(rng: RandomNumberGenerator):
+static func uuidbinrng(rng: RandomNumberGenerator) -> Array[int]:
 	rng.randomize()
 	return [
 		rng.randi() & BYTE_MASK, rng.randi() & BYTE_MASK, rng.randi() & BYTE_MASK, rng.randi() & BYTE_MASK,
@@ -23,9 +24,9 @@ static func uuidbinrng(rng: RandomNumberGenerator):
 		rng.randi() & BYTE_MASK, rng.randi() & BYTE_MASK, rng.randi() & BYTE_MASK, rng.randi() & BYTE_MASK,
 	]
 
-static func v4():
+static func v4() -> String:
 	# 16 random bytes with the bytes on index 6 and 8 modified
-	var b = uuidbin()
+	var b: Array[int] = uuidbin()
 
 	return '%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x' % [
 		# low
@@ -40,9 +41,9 @@ static func v4():
 		b[10], b[11], b[12], b[13], b[14], b[15]
 	]
   
-static func v4_rng(rng: RandomNumberGenerator):
+static func v4_rng(rng: RandomNumberGenerator) -> String:
 	# 16 random bytes with the bytes on index 6 and 8 modified
-	var b = uuidbinrng(rng)
+	var b: Array[int] = uuidbinrng(rng)
 
 	return '%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x' % [
 		# low
@@ -59,13 +60,13 @@ static func v4_rng(rng: RandomNumberGenerator):
   
 var _uuid: Array
 
-func _init(rng := RandomNumberGenerator.new()) -> void:
+func _init(rng: RandomNumberGenerator = RandomNumberGenerator.new()) -> void:
 	_uuid = uuidbinrng(rng)
 
 func as_array() -> Array:
 	return _uuid.duplicate()
 
-func as_dict(big_endian := true) -> Dictionary:
+func as_dict(big_endian: bool = true) -> Dictionary:
 		if big_endian:
 			return {
 				"low"  : (_uuid[0]  << 24) + (_uuid[1]  << 16) + (_uuid[2]  << 8 ) +  _uuid[3],
@@ -97,7 +98,7 @@ func as_string() -> String:
 		_uuid[10], _uuid[11], _uuid[12], _uuid[13], _uuid[14], _uuid[15]
 	]
   
-func is_equal(other) -> bool:
+func is_equal(other: Dictionary) -> bool:
 	# Godot Engine compares Array recursively
 	# There's no need for custom comparison here.
 	return _uuid == other._uuid

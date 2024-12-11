@@ -1,6 +1,6 @@
 extends StartXR
 
-var fb_passthrough
+var fb_passthrough: Object
 var countdown_to_recenter_hmd: int = 3
 
 @onready var world_environment: WorldEnvironment = $WorldEnvironment
@@ -26,7 +26,10 @@ func enable_passthrough_mode() -> void:
 #	passthrough_geometry.hide()
 	
 	fb_passthrough = Engine.get_singleton("OpenXRFbPassthroughExtensionWrapper")
-	fb_passthrough.set_passthrough_filter(OpenXRFbPassthroughExtensionWrapper.PASSTHROUGH_FILTER_DISABLED)
+	
+	const PASSTHROUGH_FILTER_DISABLED: OpenXRFbPassthroughExtensionWrapper.PassthroughFilter = \
+		OpenXRFbPassthroughExtensionWrapper.PASSTHROUGH_FILTER_DISABLED
+	OpenXRFbPassthroughExtensionWrapper.set_passthrough_filter(PASSTHROUGH_FILTER_DISABLED)
 
 func _on_controller_button_pressed(action_name: String, controller_name: String) -> void:
 	match action_name:
@@ -57,7 +60,7 @@ func _on_main_timer_timeout() -> void:
 # https://docs.godotengine.org/en/stable/tutorials/xr/xr_action_map.html
 func _on_controller_thumbstick_changed(id: String, axis_value: Vector2, controller_name: String) -> void:
 	if id == "primary":
-		const THUMBSTICK_BACKWARD_THRESHOLD = -0.5
+		const THUMBSTICK_BACKWARD_THRESHOLD: float = -0.5
 		if axis_value.y <= THUMBSTICK_BACKWARD_THRESHOLD:
 			Utils.set_button_pressed(controller_name, "thumbstick_backward")
 		else:
@@ -65,7 +68,7 @@ func _on_controller_thumbstick_changed(id: String, axis_value: Vector2, controll
 			
 		if axis_value.y > 0.5:
 			print("-\n\n****************** DEBUG START ******************")
-			var controller_ref = Globals.controllers[controller_name]
+			var controller_ref: Dictionary = Globals.controllers[controller_name]
 			print("---------------- active_node")
 			print(controller_name, ": ", controller_ref.active_node)
 			print("---------------- group_collision.collisions")

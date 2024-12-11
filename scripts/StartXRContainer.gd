@@ -11,7 +11,6 @@ func _ready() -> void:
 	super._ready()
 	enable_passthrough_mode()
 
-
 func _process(_delta: float) -> void:
 	if countdown_to_recenter_hmd > 0:
 		countdown_to_recenter_hmd -= 1

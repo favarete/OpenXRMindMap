@@ -10,11 +10,11 @@ signal pose_recentered
 
 @export var maximum_refresh_rate : int = 90
 
-var xr_interface : OpenXRInterface
-var xr_is_focussed = false
+var xr_interface: OpenXRInterface
+var xr_is_focussed: bool = false
 
 # Called when the node enters the scene tree for the first time.
-func _ready():
+func _ready() -> void:
 	xr_interface = XRServer.find_interface("OpenXR")
 	if xr_interface and xr_interface.is_initialized():
 		print("OpenXR instantiated successfully.")
@@ -26,18 +26,29 @@ func _ready():
 		# Make sure v-sync is off, v-sync is handled by OpenXR
 		DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
 
+		var foveation_level: String = ProjectSettings.get_setting("xr/openxr/foveation_level")
 		# Enable VRS
 		if RenderingServer.get_rendering_device():
 			vp.vrs_mode = Viewport.VRS_XR
-		elif int(ProjectSettings.get_setting("xr/openxr/foveation_level")) == 0:
+		elif int(foveation_level) == 0:
 			push_warning("OpenXR: Recommend setting Foveation level to High in Project Settings")
 
 		# Connect the OpenXR events
-		xr_interface.session_begun.connect(_on_openxr_session_begun)
-		xr_interface.session_visible.connect(_on_openxr_visible_state)
-		xr_interface.session_focussed.connect(_on_openxr_focused_state)
-		xr_interface.session_stopping.connect(_on_openxr_stopping)
-		xr_interface.pose_recentered.connect(_on_openxr_pose_recentered)
+		var status_code_a: int = xr_interface.session_begun.connect(_on_openxr_session_begun)
+		if status_code_a != 0:
+			print("session_begun error: ", status_code_a)
+		var status_code_b: int = xr_interface.session_visible.connect(_on_openxr_visible_state)
+		if status_code_b != 0:
+			print("session_visible error: ", status_code_b)
+		var status_code_c: int = xr_interface.session_focussed.connect(_on_openxr_focused_state)
+		if status_code_c != 0:
+			print("session_focussed error: ", status_code_c)
+		var status_code_d: int = xr_interface.session_stopping.connect(_on_openxr_stopping)
+		if status_code_d != 0:
+			print("session_stopping error: ", status_code_d)
+		var status_code_e: int = xr_interface.pose_recentered.connect(_on_openxr_pose_recentered)
+		if status_code_e != 0:
+			print("pose_recentered error: ", status_code_e)
 	else:
 		# We couldn't start OpenXR.
 		print("OpenXR not instantiated!")
@@ -47,14 +58,14 @@ func _ready():
 # Handle OpenXR session ready
 func _on_openxr_session_begun() -> void:
 	# Get the reported refresh rate
-	var current_refresh_rate = xr_interface.get_display_refresh_rate()
+	var current_refresh_rate: float = xr_interface.get_display_refresh_rate()
 	if current_refresh_rate > 0:
 		print("OpenXR: Refresh rate reported as ", str(current_refresh_rate))
 	else:
 		print("OpenXR: No refresh rate given by XR runtime")
 
 	# See if we have a better refresh rate available
-	var new_rate = current_refresh_rate
+	var new_rate: float = current_refresh_rate
 	var available_rates : Array = xr_interface.get_available_display_refresh_rates()
 	if available_rates.size() == 0:
 		print("OpenXR: Target does not support refresh rate extension")
@@ -62,7 +73,7 @@ func _on_openxr_session_begun() -> void:
 		# Only one available, so use it
 		new_rate = available_rates[0]
 	else:
-		for rate in available_rates:
+		for rate: float in available_rates:
 			if rate > new_rate and rate <= maximum_refresh_rate:
 				new_rate = rate
 
@@ -73,7 +84,7 @@ func _on_openxr_session_begun() -> void:
 		current_refresh_rate = new_rate
 
 	# Now match our physics rate
-	Engine.physics_ticks_per_second = current_refresh_rate
+	Engine.physics_ticks_per_second = int(current_refresh_rate)
 
 
 # Handle OpenXR visible state
@@ -87,8 +98,7 @@ func _on_openxr_visible_state() -> void:
 
 		# pause our game
 		process_mode = Node.PROCESS_MODE_DISABLED
-
-		emit_signal("focus_lost")
+		focus_lost.emit()
 
 
 # Handle OpenXR focused state
@@ -99,8 +109,7 @@ func _on_openxr_focused_state() -> void:
 	# unpause our game
 	process_mode = Node.PROCESS_MODE_INHERIT
 
-	emit_signal("focus_gained")
-
+	focus_gained.emit()
 
 # Handle OpenXR stopping state
 func _on_openxr_stopping() -> void:
@@ -117,4 +126,4 @@ func _on_openxr_stopping() -> void:
 func _on_openxr_pose_recentered() -> void:
 	# User recentered view, we have to react to this by recentering the view.
 	# This is game implementation dependent.
-	emit_signal("pose_recentered")
+	pose_recentered.emit()

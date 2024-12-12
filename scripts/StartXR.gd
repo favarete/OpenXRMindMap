@@ -36,19 +36,19 @@ func _ready() -> void:
 		# Connect the OpenXR events
 		var status_code_a: int = xr_interface.session_begun.connect(_on_openxr_session_begun)
 		if status_code_a != 0:
-			print("session_begun error: ", status_code_a)
+			printerr("session_begun error: ", status_code_a)
 		var status_code_b: int = xr_interface.session_visible.connect(_on_openxr_visible_state)
 		if status_code_b != 0:
-			print("session_visible error: ", status_code_b)
+			printerr("session_visible error: ", status_code_b)
 		var status_code_c: int = xr_interface.session_focussed.connect(_on_openxr_focused_state)
 		if status_code_c != 0:
-			print("session_focussed error: ", status_code_c)
+			printerr("session_focussed error: ", status_code_c)
 		var status_code_d: int = xr_interface.session_stopping.connect(_on_openxr_stopping)
 		if status_code_d != 0:
-			print("session_stopping error: ", status_code_d)
+			printerr("session_stopping error: ", status_code_d)
 		var status_code_e: int = xr_interface.pose_recentered.connect(_on_openxr_pose_recentered)
 		if status_code_e != 0:
-			print("pose_recentered error: ", status_code_e)
+			printerr("pose_recentered error: ", status_code_e)
 	else:
 		# We couldn't start OpenXR.
 		print("OpenXR not instantiated!")

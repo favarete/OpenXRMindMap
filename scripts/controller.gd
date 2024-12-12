@@ -21,7 +21,6 @@ func _on_interactive_element_exited(area: Area3D) -> void:
 #-------------------------------------------------------------------------------
 
 func get_local_position() -> Vector3:
-#	var position_tracker = sphere_guide.global_transform.origin
 	return mind_map_container.to_local(sphere_guide.global_transform.origin)
 
 #-------------------------------------------------------------------------------

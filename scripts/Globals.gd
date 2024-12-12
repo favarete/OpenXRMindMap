@@ -6,7 +6,7 @@ const SAVE_DELAY: int = 1
 const TWEEN_CONSTRUCTION_DELAY: float = 0.1
 
 # Collisoon Layers
-const CONTROLLER_LAYER: float = 1
+const CONTROLLER_LAYER: int = 1
 const NODE_LAYER: int = 2
 const LABEL_LAYER: int = 3
 const CONNECTION_LAYER: int = 4
@@ -14,6 +14,7 @@ const MENU_LAYER: int = 5
 const KEYBOARD_LAYER: int = 6
 
 # Default Values
+const DEFAULT_MAP_TITLE: String = "My First Mind Map"
 const DEFAULT_EDGE_RADIUS: float = 0.001
 const DEFAULT_EDGE_SEGMENTS: int = 32
 const DEFAULT_NODE_TYPE: String = "common_sphere"

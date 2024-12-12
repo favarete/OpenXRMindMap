@@ -1,15 +1,7 @@
-[gd_scene load_steps=12 format=3 uid="uid://cl2t6u6m20r0p"]
+[gd_scene load_steps=9 format=3 uid="uid://cl2t6u6m20r0p"]
 
 [ext_resource type="Script" path="res://Scripts/controller.gd" id="1_td7h1"]
-[ext_resource type="Script" uid="uid://dho0olybbgrah" path="res://Scripts/ControllerRaycast.gd" id="1_ub723"]
 [ext_resource type="Shader" uid="uid://cx7bo83hducdb" path="res://Shaders/perfect_outline.gdshader" id="3_sjvan"]
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_qcj6j"]
-top_radius = 0.005
-bottom_radius = 0.005
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8meba"]
-shading_mode = 0
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_td7h1"]
 
@@ -41,16 +33,6 @@ material = SubResource("StandardMaterial3D_rioss")
 [node name="Controller" type="Node3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.07, -0.09)
 script = ExtResource("1_td7h1")
-
-[node name="ControllerRayCast" type="RayCast3D" parent="."]
-visible = false
-target_position = Vector3(0, -10, 0)
-script = ExtResource("1_ub723")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="ControllerRayCast"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
-mesh = SubResource("CylinderMesh_qcj6j")
-surface_material_override/0 = SubResource("StandardMaterial3D_8meba")
 
 [node name="Area3D" type="Area3D" parent="."]
 collision_mask = 31

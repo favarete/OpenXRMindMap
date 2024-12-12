@@ -1,13 +1,13 @@
 extends MeshInstance3D
 
-var left_controller = Globals.controllers["LeftController"]
-var right_controller = Globals.controllers["RightController"]
+var left_controller: Dictionary = Globals.controllers["LeftController"]
+var right_controller: Dictionary = Globals.controllers["RightController"]
 
-var material_hovered = load("res://Materials/hovered_element.tres")
-var material_selected = load("res://Materials/selected_element.tres")
+var material_hovered: Material = load("res://Materials/hovered_element.tres")
+var material_selected: Material = load("res://Materials/selected_element.tres")
 
-var is_left_active_node = false
-var is_right_active_node = false
+var is_left_active_node: bool = false
+var is_right_active_node: bool = false
 
 func _process(_delta: float) -> void:
 	if is_instance_valid(left_controller.active_node):

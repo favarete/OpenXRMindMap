@@ -1,22 +1,22 @@
 extends Node
 
 func get_main_timer() -> Timer:
-	var path_to_node: String = "StartXR/MainTimer"
+	var path_to_node: String = "StartXRContainer/MainTimer"
 	var root: Window = get_root()
 	return root.get_node(path_to_node) if root.has_node(path_to_node) else null
 
 func get_mind_map_container() -> Node3D:
-	var path_to_node: String = "StartXR/XROrigin3D/MindMapContainer"
+	var path_to_node: String = "StartXRContainer/XROrigin3D/MindMapContainer"
 	var root: Window = get_root()
 	return root.get_node(path_to_node) if root.has_node(path_to_node) else null
 
 func get_mindmap_node_by_name(node_name: String) -> MeshInstance3D:
-	var path_to_node: String = "StartXR/XROrigin3D/MindMapContainer/" + node_name
+	var path_to_node: String = "StartXRContainer/XROrigin3D/MindMapContainer/" + node_name
 	var root: Window = get_root()
 	return root.get_node(path_to_node) if root.has_node(path_to_node) else null
 
 func get_controller_node_by_name(controller_name: String) -> XRController3D:
-	var path_to_node: String = "StartXR/XROrigin3D/" + controller_name
+	var path_to_node: String = "StartXRContainer/XROrigin3D/" + controller_name
 	var root: Window = get_root()
 	return root.get_node(path_to_node) if root.has_node(path_to_node) else null
 		

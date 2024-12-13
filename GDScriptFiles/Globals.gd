@@ -19,7 +19,7 @@ const DEFAULT_EDGE_RADIUS: float = 0.001
 const DEFAULT_EDGE_SEGMENTS: int = 32
 const DEFAULT_NODE_TYPE: String = "common_sphere"
 const DEFAULT_NODE_COLOR: String = "#FFFFFF"
-const DEFAULT_NODE_SCALE: float = 0.05
+const DEFAULT_NODE_SCALE: float = 0.025
 const DEFAULT_LABEL_TEXT: String = ""
 const DEFAULT_LABEL_SCALE: int = 1
 

@@ -10,6 +10,9 @@ extends Node3D
 @onready var collision_guide: Area3D = $Area3D
 @onready var mind_map_container: Node3D = Utils.get_mind_map_container()
 
+var material_default: Material = load("res://Materials/controller_main_sphere_default.tres")
+var material_animation: Material = load("res://Materials/controller_main_sphere_animation.tres")
+
 #-------------------------------------------------------------------------------
 
 func _on_interactive_element_entered(area: Area3D) -> void:
@@ -72,9 +75,14 @@ var scale_value: float = 0.0
 func reset_visual_feedback() -> void:
 	visual_feedback.scale = Vector3(MIN_SIZE, MIN_SIZE, MIN_SIZE)
 	visual_feedback.visible = false
+	
+	var sphere_guide_mesh: Mesh = sphere_guide.mesh
+	sphere_guide_mesh.material = material_default
 	scale_value = MIN_SIZE
 
 #-------------------------------------------------------------------------------
+func _ready() -> void:
+	sphere_guide.scale = Vector3.ONE * 0.05
 
 func _process(_delta: float) -> void:
 	if in_delete_position():
@@ -89,6 +97,8 @@ func _process(_delta: float) -> void:
 		else:
 			if valid_add_node_action():
 				if not visual_feedback.visible:
+					var sphere_guide_mesh: Mesh = sphere_guide.mesh
+					sphere_guide_mesh.material = material_animation
 					visual_feedback.visible = true
 				scale_value += GROWTH_SPEED
 				visual_feedback.scale = Vector3(scale_value, scale_value, scale_value)

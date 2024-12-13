@@ -1,8 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://cyfhw445f4w0v"]
+[gd_scene load_steps=8 format=3 uid="uid://cyfhw445f4w0v"]
 
 [ext_resource type="Script" path="res://GDScriptFiles/StartXRContainer.gd" id="1_2o5qn"]
 [ext_resource type="Script" path="res://GDScriptFiles/MindMapOrchestrator.gd" id="2_d2soe"]
 [ext_resource type="PackedScene" uid="uid://cl2t6u6m20r0p" path="res://Nodes/Essentials/controller.tscn" id="2_h572j"]
+[ext_resource type="PackedScene" uid="uid://clc5dre31iskm" path="res://addons/godot-xr-tools/xr/start_xr.tscn" id="4_bnr7i"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_tvdja"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -16,7 +17,7 @@ background_mode = 2
 sky = SubResource("Sky_x0hsf")
 tonemap_mode = 2
 
-[node name="StartXR" type="Node3D"]
+[node name="StartXRContainer" type="Node3D"]
 script = ExtResource("1_2o5qn")
 
 [node name="MainTimer" type="Timer" parent="."]
@@ -55,6 +56,8 @@ transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 0, 0, 0)
 [node name="MindMapContainer" type="Node3D" parent="XROrigin3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5)
 script = ExtResource("2_d2soe")
+
+[node name="StartXR" parent="." instance=ExtResource("4_bnr7i")]
 
 [connection signal="timeout" from="MainTimer" to="." method="_on_main_timer_timeout"]
 [connection signal="button_pressed" from="XROrigin3D/LeftController" to="." method="_on_controller_button_pressed" binds= ["LeftController"]]

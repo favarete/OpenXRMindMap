@@ -1,7 +1,8 @@
 [gd_scene load_steps=9 format=3 uid="uid://cl2t6u6m20r0p"]
 
 [ext_resource type="Script" path="res://GDScriptFiles/controller.gd" id="1_td7h1"]
-[ext_resource type="Shader" uid="uid://cx7bo83hducdb" path="res://Shaders/perfect_outline.gdshader" id="3_sjvan"]
+[ext_resource type="Material" uid="uid://cv6ethkljigcw" path="res://Materials/controller_main_sphere_default.tres" id="3_06xkm"]
+[ext_resource type="Shader" path="res://Shaders/perfect_outline.gdshader" id="3_sjvan"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_td7h1"]
 
@@ -9,7 +10,7 @@
 render_priority = 0
 shader = ExtResource("3_sjvan")
 shader_parameter/outline_color = null
-shader_parameter/outline_width = 10.0
+shader_parameter/outline_width = 5.0
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sjvan"]
 transparency = 1
@@ -23,12 +24,11 @@ emission_energy_multiplier = 0.2
 [sub_resource type="SphereMesh" id="SphereMesh_gbk40"]
 material = SubResource("StandardMaterial3D_sjvan")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rioss"]
-transparency = 1
-albedo_color = Color(0, 0, 0, 0.490196)
-
 [sub_resource type="SphereMesh" id="SphereMesh_qlaky"]
-material = SubResource("StandardMaterial3D_rioss")
+resource_local_to_scene = true
+material = ExtResource("3_06xkm")
+radial_segments = 256
+rings = 12
 
 [node name="Controller" type="Node3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.07, -0.09)
@@ -45,13 +45,12 @@ shape = SubResource("SphereShape3D_td7h1")
 [node name="Guide" type="Node3D" parent="."]
 
 [node name="VisualFeedback" type="MeshInstance3D" parent="Guide"]
-transform = Transform3D(0.001, 0, 0, 0, 0.001, 0, 0, 0, 0.001, 0, 0, 0)
 material_overlay = SubResource("ShaderMaterial_gbk40")
 mesh = SubResource("SphereMesh_gbk40")
 skeleton = NodePath("../..")
 
 [node name="MainSphere" type="MeshInstance3D" parent="Guide"]
-transform = Transform3D(0.05, 0, 0, 0, 0.05, 0, 0, 0, 0.05, 0, 0, 0)
+transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, 0, 0, 0)
 mesh = SubResource("SphereMesh_qlaky")
 skeleton = NodePath("../..")
 

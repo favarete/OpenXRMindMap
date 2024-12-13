@@ -4,8 +4,8 @@ var fb_passthrough: Object
 var countdown_to_recenter_hmd: int = 3
 
 @onready var world_environment: WorldEnvironment = $WorldEnvironment
-@onready var left_controller_ray_cast: RayCast3D = $XROrigin3D/LeftController/Controller/ControllerRayCast
-@onready var right_controller_ray_cast: RayCast3D = $XROrigin3D/RightController/Controller/ControllerRayCast
+#@onready var left_controller_ray_cast: RayCast3D = $XROrigin3D/LeftController/Controller/ControllerRayCast
+#@onready var right_controller_ray_cast: RayCast3D = $XROrigin3D/RightController/Controller/ControllerRayCast
 
 func _ready() -> void:
 	super._ready()

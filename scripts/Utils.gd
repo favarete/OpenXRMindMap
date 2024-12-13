@@ -25,62 +25,66 @@ func get_root() -> Window:
 
 #-------------------------------------------------------------------------------
 
-func get_node_name_from_collider(area: Area3D):
+func get_node_name_from_collider(area: Area3D) -> String:
 	return area.get_parent().name
 	
 #-------------------------------------------------------------------------------
 
 func set_active_node(controller_name: String, node_instance: MeshInstance3D) -> void:
-	var controller_ref = Globals.controllers[controller_name]
+	var controller_ref: Dictionary = Globals.controllers[controller_name]
 	controller_ref.active_node = node_instance
 
-func set_node_from_collison(controller_name: String, area: Area3D):
-	var controller_ref = Globals.controllers[controller_name]
-	var new_collision = get_mindmap_node_by_name(get_node_name_from_collider(area))
+func set_node_from_collison(controller_name: String, area: Area3D) -> void:
+	var controller_ref: Dictionary = Globals.controllers[controller_name]
+	var new_collision: MeshInstance3D = get_mindmap_node_by_name(get_node_name_from_collider(area))
 	
-	if not controller_ref.group_collision.collisions.has(new_collision):
-		controller_ref.group_collision.collisions.append(new_collision)
+	var local_collisions: Array = controller_ref.group_collision.collisions
+	if not local_collisions.has(new_collision):
+		local_collisions.append(new_collision)
 
-func unset_node_from_collison(controller_name: String, area: Area3D):
-	var controller_ref = Globals.controllers[controller_name]
+func unset_node_from_collison(controller_name: String, area: Area3D) -> void:
+	var controller_ref: Dictionary = Globals.controllers[controller_name]
 	
-	var node_ref = get_mindmap_node_by_name(get_node_name_from_collider(area))
+	var node_ref: MeshInstance3D = get_mindmap_node_by_name(get_node_name_from_collider(area))
 	
-	if controller_ref.group_collision.collisions.has(node_ref):
-		controller_ref.group_collision.collisions.erase(node_ref)
+	var local_collisions: Array = controller_ref.group_collision.collisions
+	if local_collisions.has(node_ref):
+		local_collisions.erase(node_ref)
 
 #-------------------------------------------------------------------------------
 
-signal update_edge(edge_node, start_pos, end_pos)
-func move_active_node_edge(edges: Array):
-	var active_mind_map = Globals.get_active_mindmap()
-	for id in edges:
-		var edge_node = get_mindmap_node_by_name(id)
-		var source_node = get_mindmap_node_by_name(active_mind_map.edges[id].source)
-		var target_node = get_mindmap_node_by_name(active_mind_map.edges[id].target)
+signal update_edge(edge_node: MeshInstance3D, start_pos: MeshInstance3D, end_pos: MeshInstance3D)
+func move_active_node_edge(edges: Array) -> void:
+	var active_mind_map: Dictionary = Globals.get_active_mindmap()
+	for id: String in edges:
+		var edge_node: MeshInstance3D = get_mindmap_node_by_name(id)
+		
+		var source_node_name: String = active_mind_map.edges[id].source
+		var source_node: MeshInstance3D = get_mindmap_node_by_name(source_node_name)
+		
+		var target_node_name: String = active_mind_map.edges[id].target
+		var target_node: MeshInstance3D = get_mindmap_node_by_name(target_node_name)
 		update_edge.emit(edge_node, source_node.position, target_node.position)
 
 
-func move_active_node(controller_name: String, controller_position: Vector3):
-	var controller_ref = Globals.controllers[controller_name]
+func move_active_node(controller_name: String, controller_position: Vector3) -> void:
+	var controller_ref: Dictionary = Globals.controllers[controller_name]
+	var active_node: MeshInstance3D = controller_ref.active_node
 	
-	controller_ref.active_node.position = controller_position + controller_ref.offset
+	active_node.position = controller_position + controller_ref.offset
+	update_mindmap_data({"node_instance": active_node}, "update-node")
 	
-	update_mindmap_data(controller_ref.active_node, "update-node")
-	
-	var active_node_edges = controller_ref.active_node.get_meta("edges")
+	var active_node_edges: Array = active_node.get_meta("edges")
 	if not active_node_edges.is_empty():
 		move_active_node_edge(active_node_edges)
 
 #-------------------------------------------------------------------------------
 
-signal add_node(key, value)
-func add_new_node(controller_name: String, controller_position: Vector3):
-	#var controller_ref = Globals.controllers[controller_name]
-	
-	var new_node_key = UniqueUserID.v4()
-	#var adjusted_controller_position = controller_position + controller_ref.offset
-	var new_node_value = {
+signal add_node(key: String, value: Dictionary)
+func add_new_node(controller_name: String, controller_position: Vector3) -> void:	
+	var new_node_key: String = UUID.v4()
+
+	var new_node_value: Dictionary = {
 		"label": Globals.DEFAULT_LABEL_TEXT,
 		"type": Globals.DEFAULT_NODE_TYPE,
 		"color": Globals.DEFAULT_NODE_COLOR,
@@ -101,25 +105,25 @@ func add_new_node(controller_name: String, controller_position: Vector3):
 	
 	update_mindmap_data({"key": new_node_key, "value": new_node_value}, "add-node")
 
-func remove_active_node(controller_name: String):
+func remove_active_node(controller_name: String) -> void:
 	if is_instance_valid(Globals.controllers[controller_name].active_node):
-		var node_name = Globals.controllers[controller_name].active_node.name
-		var node_instance = get_mindmap_node_by_name(node_name)
+		var node_name: String = Globals.controllers[controller_name].active_node.name
+		var node_instance: MeshInstance3D = get_mindmap_node_by_name(node_name)
 		if node_instance:
-			var tween = create_tween().bind_node(node_instance)
-			var scale_in_vector = node_instance.scale * (Vector3.ONE * 1.1)
-			tween.tween_property(node_instance, "scale", scale_in_vector, 
+			var tween: Tween = create_tween().bind_node(node_instance)
+			var scale_in_vector: Vector3 = node_instance.scale * (Vector3.ONE * 1.1)
+			var _in: PropertyTweener = tween.tween_property(node_instance, "scale", scale_in_vector, 
 				Globals.TWEEN_CONSTRUCTION_DELAY).set_ease(Tween.EASE_IN)
-			tween.tween_property(node_instance, "scale", Vector3.ONE * 0.001, 
+			var _out: PropertyTweener = tween.tween_property(node_instance, "scale", Vector3.ONE * 0.001, 
 				Globals.TWEEN_CONSTRUCTION_DELAY).set_ease(Tween.EASE_OUT)
-			tween.tween_callback(func (): node_instance.queue_free())
+			var _cb: CallbackTweener = tween.tween_callback(func () -> void: node_instance.queue_free())
 			Globals.controllers[controller_name].active_node = null
 		
-		var actual_mindmap = Globals.get_active_mindmap()
-		var edges_to_remove = actual_mindmap.nodes[node_name].edges
+		var actual_mindmap: Dictionary = Globals.get_active_mindmap()
+		var edges_to_remove: Array = actual_mindmap.nodes[node_name].edges
 		
-		for edge_id in edges_to_remove:
-			var edges_instance = get_mindmap_node_by_name(edge_id)
+		for edge_id: String in edges_to_remove:
+			var edges_instance: MeshInstance3D = get_mindmap_node_by_name(edge_id)
 			if edges_instance: edges_instance.queue_free()
 		
 		update_mindmap_data({
@@ -129,17 +133,19 @@ func remove_active_node(controller_name: String):
 
 #-------------------------------------------------------------------------------
 
-func update_node_connection(new_edge_data: Dictionary):
-	var start_node_instance = get_mindmap_node_by_name(new_edge_data.source)
-	var end_node_instance = get_mindmap_node_by_name(new_edge_data.target)
-	var edge_id = new_edge_data.key
+func update_node_connection(new_edge_data: Dictionary) -> void:
+	var source_name: String = new_edge_data.source
+	var target_name: String = new_edge_data.target
+	var start_node_instance: MeshInstance3D = get_mindmap_node_by_name(source_name)
+	var end_node_instance: MeshInstance3D = get_mindmap_node_by_name(target_name)
+	var edge_id: String = new_edge_data.key
 	
-	var start_node_edges = start_node_instance.get_meta("edges")
+	var start_node_edges: Array = start_node_instance.get_meta("edges")
 	if not start_node_edges.has(edge_id):
 		start_node_edges.append(edge_id)
 		start_node_instance.set_meta("edges", start_node_edges)
 		
-	var end_node_edges = end_node_instance.get_meta("edges")
+	var end_node_edges: Array = end_node_instance.get_meta("edges")
 	if not end_node_edges.has(edge_id):
 		end_node_edges.append(edge_id)
 		end_node_instance.set_meta("edges", end_node_edges)
@@ -162,21 +168,21 @@ func update_node_connection(new_edge_data: Dictionary):
 			#]
 		#},
 
-func update_mindmap_data(reference_data, action_name):
-	var actual_mindmap = Globals.get_active_mindmap()
+func update_mindmap_data(reference_data: Dictionary, action_name: String) -> void:
+	var actual_mindmap: Dictionary = Globals.get_active_mindmap()
 	
 	match action_name:
 		"update-node":
-			var node_to_update = actual_mindmap.nodes[reference_data.name]
+			var node_to_update: Dictionary = actual_mindmap.nodes[reference_data.node_instance.name]
 	
 			#node_to_update.label = reference_node.label
 	
 			#node_to_update.type =  reference_node.type
 			#node_to_update.color =  reference_node.color
 			node_to_update.position = {
-				"x": reference_data.position.x,
-				"y": reference_data.position.y,
-				"z": reference_data.position.z
+				"x": reference_data.node_instance.position.x,
+				"y": reference_data.node_instance.position.y,
+				"z": reference_data.node_instance.position.z
 				}
 			#node_to_update.scales = {
 				#"label": reference_node,
@@ -190,35 +196,37 @@ func update_mindmap_data(reference_data, action_name):
 				"target": reference_data.target
 			}
 		"remove-node":
-			if actual_mindmap.nodes.has(reference_data.node_to_remove):
-				actual_mindmap.nodes.erase(reference_data.node_to_remove)
-			for edge_id in reference_data.edges_to_remove:
-				if actual_mindmap.edges.has(edge_id):
-					var source_node_id = actual_mindmap.edges[edge_id].source
-					var target_node_id = actual_mindmap.edges[edge_id].target
+			var node_data: Dictionary = actual_mindmap.nodes
+			if node_data.has(reference_data.node_to_remove):
+				var _nl: bool = node_data.erase(reference_data.node_to_remove)
+			for edge_id: String in reference_data.edges_to_remove:
+				var map_edges_data: Dictionary = actual_mindmap.edges
+				if map_edges_data.has(edge_id):
+					var source_node_id: String = actual_mindmap.edges[edge_id].source
+					var target_node_id: String = actual_mindmap.edges[edge_id].target
 					
-					var node_to_clean = source_node_id \
+					var node_to_clean_id: String = source_node_id \
 						if reference_data.node_to_remove == target_node_id else target_node_id
-					if actual_mindmap.nodes.has(node_to_clean):
-						actual_mindmap.nodes[node_to_clean].edges.erase(edge_id)
-			
-					actual_mindmap.edges.erase(edge_id)
+					if node_data.has(node_to_clean_id):
+						var node_to_clean: Array = node_data[node_to_clean_id].edges
+						node_to_clean.erase(edge_id)
+					var _er: bool = map_edges_data.erase(edge_id)
 
 #-------------------------------------------------------------------------------
 
-signal add_edge(key, value)
-func verify_edge_action(controller_name: String, collision_guide: Array[Area3D]):
-	var controller_ref = Globals.controllers[controller_name]
-	var start_connection = controller_ref.node_connection.start.name
+signal add_edge(key: String, value: Dictionary)
+func verify_edge_action(controller_name: String, collision_guide: Array) -> void:
+	var controller_ref: Dictionary = Globals.controllers[controller_name]
+	var start_connection: String = controller_ref.node_connection.start.name
 
-	for collision in collision_guide:
-		var end_connection = get_node_name_from_collider(collision)
+	for collision: Area3D in collision_guide:
+		var end_connection: String = get_node_name_from_collider(collision)
 		if start_connection != end_connection:
 			unset_button_pressed(controller_name, "trigger_click")
 			if Globals.connection_is_new(start_connection, end_connection):
-				var new_edge_key = UniqueUserID.v4()
+				var new_edge_key: String = UUID.v4()
 				
-				var new_edge_data = {
+				var new_edge_data: Dictionary = {
 					"source": start_connection, 
 					"target": end_connection
 				}
@@ -233,24 +241,25 @@ func verify_edge_action(controller_name: String, collision_guide: Array[Area3D])
 
 #-------------------------------------------------------------------------------
 
-func set_controller_offset(controller_name: String):
-	var controller_ref = Globals.controllers[controller_name]
+func set_controller_offset(controller_name: String) -> void:
+	var controller_ref: Dictionary = Globals.controllers[controller_name]
 	if is_instance_valid(controller_ref.active_node):
-		var node_position = controller_ref.active_node.global_transform.origin
-		var controller_instance = get_controller_node_by_name(controller_name)
-		var controller_collider = controller_instance.get_node("Controller/Guide/MainSphere")
+		var node_position: Vector3 = controller_ref.active_node.global_transform.origin
+		var controller_instance: XRController3D = get_controller_node_by_name(controller_name)
+		var controller_collider: MeshInstance3D = controller_instance.get_node("Controller/Guide/MainSphere")
 	
-		controller_ref.offset = node_position  - controller_collider.global_transform.origin
+		controller_ref.offset = node_position - controller_collider.global_transform.origin
 		
 #-------------------------------------------------------------------------------
 
-func set_button_pressed(controller_name: String, action: String):
-	var controller_ref = Globals.controllers[controller_name]
+func set_button_pressed(controller_name: String, action: String) -> void:
+	var controller_ref: Dictionary = Globals.controllers[controller_name]
+	var active_actions: Array = controller_ref.active_actions
 
 	set_controller_offset(controller_name)
-	if not controller_ref.active_actions.has(action):
+	if not active_actions.has(action):
 		if action == "trigger_click" and \
-		not controller_ref.active_actions.has("thumbstick_backward"):
+		not active_actions.has("thumbstick_backward"):
 			if controller_ref.active_node:
 				controller_ref.node_connection.is_adding_edge = true
 				controller_ref.node_connection.start = controller_ref.active_node
@@ -259,16 +268,17 @@ func set_button_pressed(controller_name: String, action: String):
 				controller_ref.node_connection.start = null
 			controller_ref.node_connection.end = null
 				
-		controller_ref.active_actions.append(action)
+		active_actions.append(action)
 
-func unset_button_pressed(controller_name: String, action: String):
-	var controller_ref = Globals.controllers[controller_name]
-	
-	if controller_ref.active_actions.has(action):
-		if controller_ref.active_actions.has("trigger_click"):
+func unset_button_pressed(controller_name: String, action: String) -> void:
+	var controller_ref: Dictionary = Globals.controllers[controller_name]
+	var active_actions: Array = controller_ref.active_actions
+
+	if active_actions.has(action):
+		if active_actions.has("trigger_click"):
 			controller_ref.node_connection.is_adding_edge = false
 			controller_ref.node_connection.start = null
 			controller_ref.node_connection.end = null
 		
-		controller_ref.active_actions.erase(action)
+		active_actions.erase(action)
 		controller_ref.offset = Vector3.ZERO

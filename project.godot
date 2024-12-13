@@ -19,10 +19,10 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-Utils="*res://Scripts/Utils.gd"
-Globals="*res://Scripts/Globals.gd"
-Saver="*res://Scripts/Saver.gd"
-UniqueUserID="*res://Scripts/uuid.gd"
+Utils="*res://GDScriptFiles/Utils.gd"
+Globals="*res://GDScriptFiles/Globals.gd"
+Saver="*res://GDScriptFiles/Saver.gd"
+UniqueUserID="*res://GDScriptFiles/uuid.gd"
 
 [debug]
 

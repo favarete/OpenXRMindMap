@@ -105,7 +105,7 @@ func create_node(key: String, value: Dictionary) -> void:
 			node_position_z
 			)
 			
-		node.set_script(load("res://Scripts/MapNodeInstance.gd"))
+		node.set_script(load("res://GDScriptFiles/MapNodeInstance.gd"))
 		add_child(node)
 		
 		# Adicionar um Area3D ao nó

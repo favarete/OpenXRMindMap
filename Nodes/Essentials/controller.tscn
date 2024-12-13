@@ -1,6 +1,6 @@
 [gd_scene load_steps=9 format=3 uid="uid://cl2t6u6m20r0p"]
 
-[ext_resource type="Script" path="res://Scripts/controller.gd" id="1_td7h1"]
+[ext_resource type="Script" path="res://GDScriptFiles/controller.gd" id="1_td7h1"]
 [ext_resource type="Shader" uid="uid://cx7bo83hducdb" path="res://Shaders/perfect_outline.gdshader" id="3_sjvan"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_td7h1"]
